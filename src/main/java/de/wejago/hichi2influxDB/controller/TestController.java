@@ -1,9 +1,11 @@
 package de.wejago.hichi2influxDB.controller;
 
-import java.sql.SQLOutput;
-import org.influxdb.InfluxDB;
-import org.influxdb.InfluxDBFactory;
-import org.influxdb.dto.Pong;
+import com.influxdb.client.InfluxDBClient;
+import com.influxdb.client.InfluxDBClientFactory;
+import com.influxdb.client.WriteApiBlocking;
+import com.influxdb.client.domain.WritePrecision;
+import com.influxdb.client.write.Point;
+import java.time.Instant;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -11,20 +13,22 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/test")
 public class TestController {
-    @GetMapping("/db-connection")
-    public void dbConnect() {
-        String databaseURL = "localhost:8086/bucket1";
-        String userName = "wejago";
-        String password = "wejagoParola";
-        InfluxDB influxDB = InfluxDBFactory.connect(databaseURL, userName, password);
+    @GetMapping("/db-test")
+    public void dbConnectNew() {
+        InfluxDBClient influxDBClient = this.buildConnection("http://localhost:8086", "9UBCCJiu9Tn3xdtUqriXfYK_WFmSaT8yy21QyDdpJ4-hE8yoOX3m9s78WYN_P6u0vvtbjuVDt90sJpm04lmKdA==", "bucket1", "wejago");
+        System.out.println(influxDBClient);
+        WriteApiBlocking writeApi = influxDBClient.getWriteApiBlocking();
 
-        Pong response = influxDB.ping();
-        if (response.getVersion().equalsIgnoreCase("unknown")) {
-            System.out.println("Error pinging server.");
-            return;
-        } else {
-            System.out.println("ping was successful!");
-        }
+        Point point = Point.measurement("sensor").addTag("sensor_id", "TLM0100").addField("location", "Main Lobby")
+                           .addField("model_number", "TLM89092A")
+                           .time(Instant.now(), WritePrecision.MS);
 
+        writeApi.writePoint(point);
+    }
+
+
+
+    private InfluxDBClient buildConnection(String url, String token, String bucket, String org) {
+        return InfluxDBClientFactory.create(url, token.toCharArray(), org, bucket);
     }
 }
