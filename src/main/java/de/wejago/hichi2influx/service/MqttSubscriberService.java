@@ -19,16 +19,15 @@ public class MqttSubscriberService {
 
     private final SensorMessageSubscriber sensorMessageSubscriber;
 
-    private final MqttClientConfig mqttClientConfig;
+    private final IMqttClient mqttClient;
+    private final MqttConnectOptions mqttConnectOptions;
 
     private final MqttProperties mqttProperties;
 
     @PostConstruct
     public void postConstruct() {
         try {
-            IMqttClient mqttClient = mqttClientConfig.getMqttClient();
-            MqttConnectOptions connectOptions = mqttClientConfig.getMqttConnectOptions();
-            mqttClient.connect(connectOptions);
+            mqttClient.connect(mqttConnectOptions);
             mqttClient.subscribe(mqttProperties.getTopic(), sensorMessageSubscriber);
             log.info("Successfully connected to MQTT client!");
         } catch (MqttException e) {
