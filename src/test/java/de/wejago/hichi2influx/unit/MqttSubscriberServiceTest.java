@@ -30,9 +30,6 @@ public class MqttSubscriberServiceTest {
     private IMqttClient mqttClient;
 
     @Mock
-    private MqttClientConfig mqttClientConfig;
-
-    @Mock
     private MqttConnectOptions mqttConnectOptions;
 
     @Mock
@@ -44,25 +41,15 @@ public class MqttSubscriberServiceTest {
     @InjectMocks
     private MqttSubscriberService mqttSubscriberService;
 
-    @BeforeEach
-    public void setup() {
-        when(mqttClientConfig.getMqttClient()).thenReturn(mqttClient);
-    }
-
-
     @Test
     void testConnectSuccess(CapturedOutput output) throws MqttException {
         // GIVEN
-        when(mqttClientConfig.getMqttClient()).thenReturn(mqttClient);
-        when(mqttClientConfig.getMqttConnectOptions()).thenReturn(mqttConnectOptions);
         when(mqttProperties.getTopic()).thenReturn(TOPIC_TEST);
 
         // WHEN
         mqttSubscriberService.postConstruct();
 
         // THEN
-        verify(mqttClientConfig, times(1)).getMqttClient();
-        verify(mqttClientConfig, times(1)).getMqttConnectOptions();
         verify(mqttClient, times(1)).connect(mqttConnectOptions);
         verify(mqttClient, times(1)).subscribe(TOPIC_TEST, sensorMessageSubscriber);
         assertThat(output.getOut()).contains("Successfully connected to MQTT client!");
@@ -71,7 +58,6 @@ public class MqttSubscriberServiceTest {
     @Test
     void testConnectThrowsException(CapturedOutput output) throws MqttException {
         // GIVEN
-        when(mqttClientConfig.getMqttConnectOptions()).thenReturn(mqttConnectOptions);
         doThrow(new MqttException(1)).when(mqttClient).connect(mqttConnectOptions);
 
         // WHEN
@@ -79,8 +65,6 @@ public class MqttSubscriberServiceTest {
 
         // THEN
         verify(mqttClient, times(1)).connect(mqttConnectOptions);
-        verify(mqttClientConfig, times(1)).getMqttClient();
-        verify(mqttClientConfig, times(1)).getMqttConnectOptions();
         assertThatThrownBy(() -> { throw new MqttException(1); })
             .isInstanceOf(MqttException.class)
             .hasMessage("Invalid protocol version");

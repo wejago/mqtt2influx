@@ -7,6 +7,7 @@ import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -21,6 +22,7 @@ public class MqttClientConfig {
 
     private final MqttProperties mqttProperties;
 
+    @Bean
     public IMqttClient getMqttClient() {
         try {
             MemoryPersistence persistence = new MemoryPersistence();
@@ -31,6 +33,7 @@ public class MqttClientConfig {
         }
     }
 
+    @Bean
     public MqttConnectOptions getMqttConnectOptions() {
         MqttConnectOptions connectOptions = new MqttConnectOptions();
         connectOptions.setUserName(mqttProperties.getUsername());
