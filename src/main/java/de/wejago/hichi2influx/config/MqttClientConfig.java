@@ -26,6 +26,7 @@ public class MqttClientConfig {
     public IMqttClient getMqttClient() {
         try {
             MemoryPersistence persistence = new MemoryPersistence();
+            log.info("mqtt IP: " + mqttProperties.getBrokerIp() + " user: " + mqttProperties.getUsername());
             return new MqttClient(buildBrokerUrl(), CLIENT_ID, persistence);
         } catch (MqttException e) {
             log.error("Error connecting to MQTT client!", e);

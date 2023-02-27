@@ -1,0 +1,57 @@
+version: "3"
+services:
+  mosquitto:
+    image: eclipse-mosquitto
+    container_name: mosquitto
+    ports:
+      - 1883:1883
+    networks:
+      - mqtt2influxdb-network
+    volumes:
+      - "./mosquitto.conf:/mosquitto/config/mosquitto.conf"
+      - "./users.conf:/mosquitto/config/users.conf"
+      - "./mosquitto/data:/mosquitto/data"
+      - "./mosquitto/log:/mosquitto/log"
+    restart: unless-stopped
+
+  mqtt2influxdb:
+    container_name: mqtt2influx
+    image: emowejago/mqtt2influxdb
+    ports:
+      - "8181:8080"
+    networks:
+      - mqtt2influxdb-network
+    depends_on:
+      - influxdb
+    environment:
+      - INFLUX_URL=http://influxdb:8086
+      - INFLUX_TOKEN=${INFLUX_TOKEN}
+      - MQTT_BROKER_IP=mosquitto
+      - MQTT_BROKER_PORT=1883
+      - MQTT_TOPIC=tele/tasmota_FA2296/SENSOR
+      - MQTT_USERNAME=${MQTT_USERNAME}
+      - MQTT_PASSWORD=${MQTT_PASSWORD}
+    env_file:
+      - .env
+    restart: unless-stopped
+
+  influxdb:
+    container_name: influxdb
+    image: influxdb:latest
+    ports:
+      - "8086:8086"
+    environment:
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_ORG=wejago
+      - DOCKER_INFLUXDB_INIT_BUCKET=bucket1
+      - DOCKER_INFLUXDB_INIT_USERNAME=${DOCKER_INFLUXDB_INIT_USERNAME}
+      - DOCKER_INFLUXDB_INIT_PASSWORD=${DOCKER_INFLUXDB_INIT_PASSWORD}
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=${INFLUX_TOKEN}
+    env_file:
+      - .env
+    networks:
+      -   mqtt2influxdb-network
+    restart: unless-stopped
+
+networks:
+  mqtt2influxdb-network:
