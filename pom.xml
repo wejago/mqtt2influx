@@ -11,8 +11,11 @@
 	<groupId>de.wejago</groupId>
 	<artifactId>hichi2influxDB</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>hichi2influxDB</name>
-	<description>Demo project for Spring Boot</description>
+	<name>hichi2influxdb</name>
+	<description>
+		Spring Boot project that allows you to monitor and analyze data from electricity consumption/generation.
+		It connects to Hichi smartmeter device. Sends data via MQTT and stores it in an Influx database.
+	</description>
 	<properties>
 		<java.version>17</java.version>
 	</properties>
@@ -115,6 +118,7 @@
 				</executions>
 			</plugin>
 		</plugins>
+		<finalName>mqtt2influxdb-wejago</finalName>
 	</build>
 
 	<profiles>
