@@ -1,8 +1,10 @@
-HELP.md
 target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
+deployment/.env
+deployment/mosquitto/
+deployment/influxdb/
 
 ### STS ###
 .apt_generated
