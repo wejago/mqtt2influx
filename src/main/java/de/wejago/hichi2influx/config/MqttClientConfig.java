@@ -16,16 +16,15 @@ import org.springframework.web.util.UriComponentsBuilder;
 @Configuration
 @RequiredArgsConstructor
 public class MqttClientConfig {
-    private final static String PROTOCOL_TCP = "tcp";
+    private static final String PROTOCOL_TCP = "tcp";
 
-    private final static String CLIENT_ID="hichi-2-influx-db-application";
+    private static final String CLIENT_ID="hichi-2-influx-db-application";
 
     private final MqttProperties mqttProperties;
 
     @Bean
     public IMqttClient getMqttClient() {
-        try {
-            MemoryPersistence persistence = new MemoryPersistence();
+        try (MemoryPersistence persistence = new MemoryPersistence()) {
             log.info("mqtt IP: " + mqttProperties.getBrokerIp() + " user: " + mqttProperties.getUsername());
             return new MqttClient(buildBrokerUrl(), CLIENT_ID, persistence);
         } catch (MqttException e) {
