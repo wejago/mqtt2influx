@@ -1,50 +1,47 @@
 package de.wejago.hichi2influx.repository;
 
 import com.influxdb.client.InfluxDBClient;
-import com.influxdb.client.WriteApiBlocking;
-import com.influxdb.client.domain.WritePrecision;
+import com.influxdb.client.WriteApi;
 import com.influxdb.client.write.Point;
 import de.wejago.hichi2influx.config.InfluxDBConfig;
-import de.wejago.hichi2influx.dto.SensorEntry;
-import java.time.Instant;
+import java.util.Queue;
+import java.util.concurrent.LinkedBlockingQueue;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
+@Slf4j
+@EnableScheduling
 public class InfluxDbRepository {
+    private static final int SCHEDULE_INTERVAL_PERSIST_TO_DB = 30000;
     private final InfluxDBConfig influxDBConfig;
-
     private InfluxDBClient influxDBClient;
+    private Queue<Point> measurementPoints = new LinkedBlockingQueue<>();
+    private WriteApi writeApi;
 
-    public Point writePoint(SensorEntry sensorEntry) {
-        updateConnectionIfNeeded();
-        WriteApiBlocking writeApi = influxDBClient.getWriteApiBlocking();
-
-        Point point = generateMeasurementPoint(sensorEntry);
-        writeApi.writePoint(point);
-
-        return point;
+    public void writePoint(Point point) {
+        measurementPoints.add(point);
     }
 
-    private void updateConnectionIfNeeded() {
-        //set the connection only if it is empty of not active
-        if(influxDBClient == null || !influxDBClient.ping()) {
-            influxDBClient = influxDBConfig.dbConnection();
+    @Scheduled(fixedRate = SCHEDULE_INTERVAL_PERSIST_TO_DB)
+    public void persistPointsToInflux() {
+        if(!measurementPoints.isEmpty()){
+            influxDBClient = influxDBConfig.createInfluxClient();
+            int numberOfPointsWritten = 0;
+
+            writeApi = influxDBConfig.getWriteApi();
+            if(influxDBClient.ping() && writeApi != null) {
+                while (!measurementPoints.isEmpty()) {
+                    Point point = measurementPoints.poll();
+                    writeApi.writePoint(point);
+                    numberOfPointsWritten++;
+                }
+            }
+            log.info("writePoint() wrote : " + numberOfPointsWritten + " point(s).");
         }
-    }
-
-    private static Point generateMeasurementPoint(SensorEntry sensorEntry) {
-        return Point.measurement("sensor")
-                    .addTag("sensor_id", sensorEntry.getSml().getDeviceId())
-                    .addField("totalConsumption(1_8_0)", sensorEntry.getSml().getTotalConsumption())
-                    .addField("tariff1Consumption(1_8_1)", sensorEntry.getSml().getTariff1Consumption())
-                    .addField("tariff2Consumption(1_8_2)", sensorEntry.getSml().getTariff2Consumption())
-                    .addField("energyExport(2_8_0)", sensorEntry.getSml().getEnergyExport())
-                    .addField("currentConsumption(16_7_0)", sensorEntry.getSml().getCurrentConsumption())
-                    .addField("currentConsumptionPhase1(36_7_0)", sensorEntry.getSml().getCurrentConsumptionPhase1())
-                    .addField("currentConsumptionPhase2(56_7_0)", sensorEntry.getSml().getCurrentConsumptionPhase2())
-                    .addField("currentConsumptionPhase3(76_7_0)", sensorEntry.getSml().getCurrentConsumptionPhase3())
-                    .time(Instant.now(), WritePrecision.MS);
     }
 }

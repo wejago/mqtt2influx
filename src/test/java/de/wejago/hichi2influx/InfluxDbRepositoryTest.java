@@ -1,12 +1,14 @@
-package de.wejago.hichi2influx.unit;
+package de.wejago.hichi2influx;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.influxdb.client.InfluxDBClient;
-import com.influxdb.client.WriteApiBlocking;
+import com.influxdb.client.WriteApi;
 import com.influxdb.client.domain.WritePrecision;
 import com.influxdb.client.write.Point;
 import de.wejago.hichi2influx.config.InfluxDBConfig;
@@ -16,46 +18,97 @@ import de.wejago.hichi2influx.repository.InfluxDbRepository;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.util.Queue;
+import java.util.concurrent.LinkedBlockingQueue;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.internal.util.reflection.Whitebox;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 class InfluxDbRepositoryTest {
-    private final String TIME_AS_STRING = "2022-02-16 02:25:32";
-
+   private final String TIME_AS_STRING = "2022-02-16 02:25:32";
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private Queue<Point> measurementPoints;
 
     @Mock
     private InfluxDBClient influxDBClient;
-
     @Mock
-    private WriteApiBlocking writeApi;
-
+    private WriteApi writeApi;
     @Mock
     private InfluxDBConfig influxDBConfig;
-
     @InjectMocks
     private InfluxDbRepository influxDbRepository;
 
+    @BeforeEach
+    public void setup() {
+        influxDbRepository = new InfluxDbRepository(influxDBConfig);
+        measurementPoints = new LinkedBlockingQueue<>();
+    }
+
     @Test
-    void writePointShouldGenerateAndWriteMeasurementPoint() {
+    void shouldPersistPointsToInflux() {
         //GIVEN
-        SensorEntry sensorEntry = generateTestSensorEntry();
-        when(influxDBConfig.dbConnection()).thenReturn(influxDBClient);
-        when(influxDBClient.getWriteApiBlocking()).thenReturn(writeApi);
+        Point point = generateExpectedMeasurementPoint();
+        measurementPoints.add(point);
+        Whitebox.setInternalState(influxDbRepository, "measurementPoints", measurementPoints);
+        when(influxDBConfig.createInfluxClient()).thenReturn(influxDBClient);
+        when(influxDBConfig.getWriteApi()).thenReturn(writeApi);
+        when(influxDBClient.ping()).thenReturn(true);
 
         //WHEN
-        Point actualPoint = influxDbRepository.writePoint(sensorEntry);
+        influxDbRepository.persistPointsToInflux();
 
         //THEN
-        Point expectedPoint = generateExpectedMeasurementPoint(sensorEntry);
-        verify(influxDBClient, times(1)).getWriteApiBlocking();
-        assertThat(actualPoint).usingRecursiveComparison()
-            .ignoringFields("time")
-            .isEqualTo(expectedPoint);
+        assertThat(measurementPoints).isEmpty();
+        verify(writeApi, times(1)).writePoint(point);
+    }
+
+    @Test
+    void shouldNotPersistPointsToInfluxWhenMeasurementPointsIsEmpty() {
+        influxDbRepository.persistPointsToInflux();
+
+        assertThat(measurementPoints).isEmpty();
+        verify(writeApi, never()).writePoint(any());
+    }
+
+    @Test
+    void shouldNotPersistPointsToInfluxWhenInfluxDBClientIsNotAvailable() {
+        //GIVEN
+        Point point = generateExpectedMeasurementPoint();
+        measurementPoints.add(point);
+        Whitebox.setInternalState(influxDbRepository, "measurementPoints", measurementPoints);
+        when(influxDBConfig.createInfluxClient()).thenReturn(influxDBClient);
+        when(influxDBConfig.getWriteApi()).thenReturn(writeApi);
+        when(influxDBClient.ping()).thenReturn(false);
+
+        //WHEN
+        influxDbRepository.persistPointsToInflux();
+
+        //THEN
+        assertThat(measurementPoints).containsExactly(point);
+        verify(writeApi, never()).writePoint(any());
+    }
+
+    @Test
+    void shouldNotPersistPointsToInfluxWhenWriteApiIsNotAvailable() {
+        //GIVEN
+        Point point = generateExpectedMeasurementPoint();
+        measurementPoints.add(point);
+        Whitebox.setInternalState(influxDbRepository, "measurementPoints", measurementPoints);
+        when(influxDBConfig.createInfluxClient()).thenReturn(influxDBClient);
+        when(influxDBConfig.getWriteApi()).thenReturn(null);
+        when(influxDBClient.ping()).thenReturn(true);
+
+        //WHEN
+        influxDbRepository.persistPointsToInflux();
+
+        //THEN
+        assertThat(measurementPoints).containsExactly(point);
+        verify(writeApi, never()).writePoint(any());
     }
 
     private SensorEntry generateTestSensorEntry() {
@@ -76,7 +129,8 @@ class InfluxDbRepositoryTest {
         return testSensorEntry;
     }
 
-    private Point generateExpectedMeasurementPoint(SensorEntry sensorEntry) {
+    private Point generateExpectedMeasurementPoint() {
+        SensorEntry sensorEntry = generateTestSensorEntry();
         return Point.measurement("sensor")
                     .addTag("sensor_id", sensorEntry.getSml().getDeviceId())
                     .addField("totalConsumption(1_8_0)", sensorEntry.getSml().getTotalConsumption())
