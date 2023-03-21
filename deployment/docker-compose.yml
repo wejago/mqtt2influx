@@ -38,12 +38,14 @@ services:
   influxdb:
     container_name: influxdb
     image: influxdb:latest
+    volumes:
+      - "./influxdb:/var/lib/influxdb2"
     ports:
       - "8086:8086"
     environment:
       - DOCKER_INFLUXDB_INIT_MODE=setup
       - DOCKER_INFLUXDB_INIT_ORG=wejago
-      - DOCKER_INFLUXDB_INIT_BUCKET=bucket1
+      - DOCKER_INFLUXDB_INIT_BUCKET=hichi
       - DOCKER_INFLUXDB_INIT_USERNAME=${DOCKER_INFLUXDB_INIT_USERNAME}
       - DOCKER_INFLUXDB_INIT_PASSWORD=${DOCKER_INFLUXDB_INIT_PASSWORD}
       - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=${INFLUX_TOKEN}
@@ -51,6 +53,29 @@ services:
       - .env
     networks:
       -   mqtt2influxdb-network
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    depends_on:
+      - influxdb
+    ports:
+      - 3000:3000
+    volumes:
+      - "./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards"
+      - "./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources"
+      - "./grafana/dashboards:/var/lib/grafana/dashboards"
+    environment:
+      - DOCKER_INFLUXDB_INIT_ORG=wejago
+      - DOCKER_INFLUXDB_INIT_BUCKET=hichi
+      - GF_SECURITY_ADMIN_USER=${GF_SECURITY_ADMIN_USER}
+      - GF_SECURITY_ADMIN_PASSWORD=${GF_SECURITY_ADMIN_PASSWORD}
+      - INFLUX_REMOTE_URL=${INFLUX_REMOTE_URL}
+    env_file:
+      - .env
+    networks:
+      - mqtt2influxdb-network
     restart: unless-stopped
 
 networks:
