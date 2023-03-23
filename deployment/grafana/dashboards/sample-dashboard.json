@@ -190,7 +190,7 @@
           "sort": "none"
         },
         "xTickLabelRotation": 0,
-        "xTickLabelSpacing": 100
+        "xTickLabelSpacing": 0
       },
       "targets": [
         {
@@ -308,7 +308,6 @@
           "custom": {
             "axisCenteredZero": false,
             "axisColorMode": "text",
-            "axisLabel": "",
             "axisPlacement": "auto",
             "fillOpacity": 80,
             "gradientMode": "none",
@@ -325,16 +324,105 @@
               "mode": "off"
             }
           },
+          "decimals": 0,
           "mappings": [
             {
               "options": {
-                "1": {
+                "0": {
                   "index": 0,
-                  "text": "1h"
+                  "text": "00:00"
+                },
+                "1": {
+                  "index": 1,
+                  "text": "01:00"
                 },
                 "2": {
-                  "index": 1,
-                  "text": "2h"
+                  "index": 2,
+                  "text": "02:00"
+                },
+                "3": {
+                  "index": 3,
+                  "text": "03:00"
+                },
+                "4": {
+                  "index": 4,
+                  "text": "04:00"
+                },
+                "5": {
+                  "index": 5,
+                  "text": "05:00"
+                },
+                "6": {
+                  "index": 6,
+                  "text": "06:00"
+                },
+                "7": {
+                  "index": 7,
+                  "text": "07:00"
+                },
+                "8": {
+                  "index": 8,
+                  "text": "08:00"
+                },
+                "9": {
+                  "index": 9,
+                  "text": "09:00"
+                },
+                "10": {
+                  "index": 10,
+                  "text": "10:00"
+                },
+                "11": {
+                  "index": 11,
+                  "text": "11:00"
+                },
+                "12": {
+                  "index": 12,
+                  "text": "12:00"
+                },
+                "13": {
+                  "index": 13,
+                  "text": "13:00"
+                },
+                "14": {
+                  "index": 14,
+                  "text": "14:00"
+                },
+                "15": {
+                  "index": 15,
+                  "text": "15:00"
+                },
+                "16": {
+                  "index": 16,
+                  "text": "16:00"
+                },
+                "17": {
+                  "index": 17,
+                  "text": "17:00"
+                },
+                "18": {
+                  "index": 18,
+                  "text": "18:00"
+                },
+                "19": {
+                  "index": 19,
+                  "text": "19:00"
+                },
+                "20": {
+                  "index": 20,
+                  "text": "20:00"
+                },
+                "21": {
+                  "index": 21,
+                  "text": "21:00"
+                },
+                "22": {
+                  "index": 22,
+                  "text": "22:00"
+                },
+                "23": {
+                  "index": 23,
+                  "text": "23:00"
                 }
               },
               "type": "value"
@@ -377,6 +465,7 @@
         "orientation": "auto",
         "showValue": "always",
         "stacking": "none",
+        "text": {},
         "tooltip": {
           "mode": "multi",
           "sort": "none"
@@ -392,26 +481,12 @@
             "type": "influxdb",
             "uid": "P951FEA4DE68E13C5"
           },
-          "query": "import \"date\"\r\nimport \"timezone\"\r\noption location = timezone.location(name: \"Europe/Berlin\")\r\n\r\nfrom(bucket: \"hichi\")\r\n  |> range(start: -1y)\r\n  |> filter(fn: (r) =>\r\n    r._measurement == \"sensor\"  and\r\n    r._field == \"currentConsumption(16_7_0)\"\r\n  )\r\n  |> map(fn: (r) => ({ r with hour: date.hour(t: r._time) }))\r\n  |> group(columns: [\"hour\"], mode:\"by\")\r\n  |> mean(column: \"_value\") \r\n  |> group()\r\n  |> sort(columns: [\"hour\"])",
+          "query": "import \"date\"\r\nimport \"timezone\"\r\noption location = timezone.location(name: \"Europe/Berlin\")\r\n\r\nfrom(bucket: \"hichi\")\r\n  |> range(start: -1y)\r\n  |> filter(fn: (r) =>\r\n    r._measurement == \"sensor\"  and\r\n    r._field == \"currentConsumption(16_7_0)\"\r\n  )\r\n  |> map(fn: (r) => ({ r with hour: date.hour(t: r._time) }))\r\n  |> group(columns: [\"hour\"], mode:\"by\")\r\n  |> mean(column: \"_value\") \r\n  |> group()\r\n",
           "refId": "A"
         }
       ],
       "title": "Average Hourly Consumption - past 12 months",
-      "transformations": [
-        {
-          "id": "convertFieldType",
-          "options": {
-            "conversions": [
-              {
-                "dateFormat": "H",
-                "destinationType": "string",
-                "targetField": "hour"
-              }
-            ],
-            "fields": {}
-          }
-        }
-      ],
+      "transformations": [],
       "type": "barchart"
     },
     {
@@ -575,7 +650,7 @@
         ]
       },
       "gridPos": {
-        "h": 9,
+        "h": 8,
         "w": 24,
         "x": 0,
         "y": 24
