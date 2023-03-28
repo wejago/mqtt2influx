@@ -14,36 +14,35 @@ import org.springframework.context.annotation.Configuration;
 public class InfluxDBConfig {
     private final InfluxDBProperties influxDBProperties;
     private InfluxDBClient influxDBClient;
-
-    public InfluxDBClient dbConnection() {
-        log.info("url: " + influxDBProperties.getUrl() + " token: " + influxDBProperties.getToken() + " org: " + influxDBProperties.getOrg() + " bucket: " + influxDBProperties.getBucket());
-        try{
-            return InfluxDBClientFactory.create(influxDBProperties.getUrl(), influxDBProperties.getToken().toCharArray(), influxDBProperties.getOrg(), influxDBProperties.getBucket());
-        } catch (InfluxException e) {
-            log.error("Failed to connect to InfluxDB", e);
-            return null;
-        }
-    }
-
-    //set the connection only if it is empty or not active
-    public InfluxDBClient createInfluxClient() {
-        try {
-            if (influxDBClient == null || !influxDBClient.ping()) {
-                influxDBClient = dbConnection();
-            }
-            return influxDBClient;
-        } catch (Exception e) {
-            log.warn("Failed to connect to InfluxDB!");
-            return null;
-        }
-    }
+    private WriteApi writeApi;
 
     public WriteApi getWriteApi() {
-        try{
-            return influxDBClient.makeWriteApi();
-        } catch (Exception e) {
-            log.warn("Failed to create writeApi from makeWriteApi()!");
+        if (writeApi == null || !influxDBClient.ping()) {
+            createWriteApi();
         }
-        return null;
+        return writeApi;
+    }
+
+    private void createWriteApi() {
+        if (writeApi != null) {
+            writeApi.close();
+        }
+        try {
+            if (influxDBClient == null || !influxDBClient.ping()) {
+                influxDBClient = getInfluxDbClient();
+            }
+            writeApi = influxDBClient.makeWriteApi();
+        } catch (InfluxException | Exception e) { // <-- @Emo: try to find the specific exception here for disconnects
+            log.warn("Failed to create writeApi: {}", e.getMessage(), e);
+        }
+    }
+
+    InfluxDBClient getInfluxDbClient() throws InfluxException {
+        log.info("url: " + influxDBProperties.getUrl() + " token: " + influxDBProperties.getToken() + " org: " +
+                influxDBProperties.getOrg() + " bucket: " + influxDBProperties.getBucket());
+        return InfluxDBClientFactory.create(influxDBProperties.getUrl(),
+                influxDBProperties.getToken().toCharArray(), influxDBProperties.getOrg(),
+                influxDBProperties.getBucket());
+
     }
 }

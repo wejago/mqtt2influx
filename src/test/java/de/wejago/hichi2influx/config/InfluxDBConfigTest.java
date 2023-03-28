@@ -1,4 +1,4 @@
-package de.wejago.hichi2influx;
+package de.wejago.hichi2influx.config;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -8,8 +8,6 @@ import static org.mockito.Mockito.when;
 import com.influxdb.client.InfluxDBClient;
 import com.influxdb.client.InfluxDBClientFactory;
 import com.influxdb.exceptions.InfluxException;
-import de.wejago.hichi2influx.config.InfluxDBConfig;
-import de.wejago.hichi2influx.config.InfluxDBProperties;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -44,7 +42,7 @@ class InfluxDBConfigTest {
     @Test
     void testDbConnectionSuccess() {
         //WHEN
-        InfluxDBClient client = influxDBConfig.dbConnection();
+        InfluxDBClient client = influxDBConfig.getInfluxDbClient();
 
         //THEN
         assertThat(client).isNotNull();
@@ -62,7 +60,7 @@ class InfluxDBConfigTest {
         InfluxDBClient client = null;
         try {
             //WHEN
-            client = influxDBConfig.dbConnection();
+            client = influxDBConfig.getInfluxDbClient();
 
             //THEN
             fail("Expected InfluxException to be thrown");
@@ -79,7 +77,7 @@ class InfluxDBConfigTest {
         when(influxDBProperties.getUrl()).thenReturn(INVALID_INFLUX_URL);
 
         // WHEN
-        InfluxDBClient influxDBClient = influxDBConfig.dbConnection();
+        InfluxDBClient influxDBClient = influxDBConfig.getInfluxDbClient();
 
         // THEN
         assertThat(influxDBClient).isNull();
