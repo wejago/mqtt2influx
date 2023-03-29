@@ -1,4 +1,4 @@
-package de.wejago.hichi2influx;
+package de.wejago.hichi2influx.config;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;

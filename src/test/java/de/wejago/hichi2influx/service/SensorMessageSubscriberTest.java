@@ -1,4 +1,4 @@
-package de.wejago.hichi2influx;
+package de.wejago.hichi2influx.service;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;

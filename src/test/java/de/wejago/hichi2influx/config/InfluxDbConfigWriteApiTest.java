@@ -1,11 +1,8 @@
-package de.wejago.hichi2influx;
+package de.wejago.hichi2influx.config;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.influxdb.client.InfluxDBClient;
 import com.influxdb.client.WriteApi;
-import de.wejago.hichi2influx.config.InfluxDBConfig;
-import de.wejago.hichi2influx.config.InfluxDBProperties;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -42,7 +39,7 @@ class InfluxDbConfigWriteApiTest {
         influxDBProperties.setBucket(INFLUX_BUCKET);
         influxDBProperties.setToken(INFLUX_TOKEN);
         influxDBConfig = new InfluxDBConfig(influxDBProperties);
-        InfluxDBClient influxDBClient = influxDBConfig.createInfluxClient();
+        influxDBConfig.getInfluxDbClient();
 
         //WHEN
         WriteApi actualWriteApi = influxDBConfig.getWriteApi();

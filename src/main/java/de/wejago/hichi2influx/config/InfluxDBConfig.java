@@ -32,7 +32,7 @@ public class InfluxDBConfig {
                 influxDBClient = getInfluxDbClient();
             }
             writeApi = influxDBClient.makeWriteApi();
-        } catch (InfluxException | Exception e) { // <-- @Emo: try to find the specific exception here for disconnects
+        } catch (Exception e) { // <-- @Emo: try to find the specific exception here for disconnects
             log.warn("Failed to create writeApi: {}", e.getMessage(), e);
         }
     }

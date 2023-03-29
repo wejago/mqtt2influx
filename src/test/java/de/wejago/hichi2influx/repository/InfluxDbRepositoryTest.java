@@ -1,4 +1,4 @@
-package de.wejago.hichi2influx;
+package de.wejago.hichi2influx.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -55,9 +55,7 @@ class InfluxDbRepositoryTest {
         Point point = generateExpectedMeasurementPoint();
         measurementPoints.add(point);
         Whitebox.setInternalState(influxDbRepository, "measurementPoints", measurementPoints);
-        when(influxDBConfig.createInfluxClient()).thenReturn(influxDBClient);
         when(influxDBConfig.getWriteApi()).thenReturn(writeApi);
-        when(influxDBClient.ping()).thenReturn(true);
 
         //WHEN
         influxDbRepository.persistPointsToInflux();
@@ -76,32 +74,12 @@ class InfluxDbRepositoryTest {
     }
 
     @Test
-    void shouldNotPersistPointsToInfluxWhenInfluxDBClientIsNotAvailable() {
-        //GIVEN
-        Point point = generateExpectedMeasurementPoint();
-        measurementPoints.add(point);
-        Whitebox.setInternalState(influxDbRepository, "measurementPoints", measurementPoints);
-        when(influxDBConfig.createInfluxClient()).thenReturn(influxDBClient);
-        when(influxDBConfig.getWriteApi()).thenReturn(writeApi);
-        when(influxDBClient.ping()).thenReturn(false);
-
-        //WHEN
-        influxDbRepository.persistPointsToInflux();
-
-        //THEN
-        assertThat(measurementPoints).containsExactly(point);
-        verify(writeApi, never()).writePoint(any());
-    }
-
-    @Test
     void shouldNotPersistPointsToInfluxWhenWriteApiIsNotAvailable() {
         //GIVEN
         Point point = generateExpectedMeasurementPoint();
         measurementPoints.add(point);
         Whitebox.setInternalState(influxDbRepository, "measurementPoints", measurementPoints);
-        when(influxDBConfig.createInfluxClient()).thenReturn(influxDBClient);
         when(influxDBConfig.getWriteApi()).thenReturn(null);
-        when(influxDBClient.ping()).thenReturn(true);
 
         //WHEN
         influxDbRepository.persistPointsToInflux();
