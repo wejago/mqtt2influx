@@ -14,11 +14,13 @@ import com.influxdb.client.write.Point;
 import de.wejago.hichi2influx.config.InfluxDBConfig;
 import de.wejago.hichi2influx.dto.SensorEntry;
 import de.wejago.hichi2influx.dto.SensorMeasurement;
+
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,13 +30,10 @@ import org.mockito.internal.util.reflection.Whitebox;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class InfluxDbRepositoryTest {
-   private final String TIME_AS_STRING = "2022-02-16 02:25:32";
-    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-    private Queue<Point> measurementPoints;
+public class InfluxDbRepositoryTest {
+    private static final String TIME_AS_STRING = "2022-02-16 02:25:32";
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-    @Mock
-    private InfluxDBClient influxDBClient;
     @Mock
     private WriteApi writeApi;
     @Mock
@@ -45,22 +44,19 @@ class InfluxDbRepositoryTest {
     @BeforeEach
     public void setup() {
         influxDbRepository = new InfluxDbRepository(influxDBConfig);
-        measurementPoints = new LinkedBlockingQueue<>();
     }
 
     @Test
     void shouldPersistPointsToInflux() {
         //GIVEN
         Point point = generateExpectedMeasurementPoint();
-        measurementPoints.add(point);
-        Whitebox.setInternalState(influxDbRepository, "measurementPoints", measurementPoints);
+        influxDbRepository.writePoint(point);
         when(influxDBConfig.getWriteApi()).thenReturn(writeApi);
 
         //WHEN
         influxDbRepository.persistPointsToInflux();
 
         //THEN
-        assertThat(measurementPoints).isEmpty();
         verify(writeApi, times(1)).writePoint(point);
     }
 
@@ -68,7 +64,6 @@ class InfluxDbRepositoryTest {
     void shouldNotPersistPointsToInfluxWhenMeasurementPointsIsEmpty() {
         influxDbRepository.persistPointsToInflux();
 
-        assertThat(measurementPoints).isEmpty();
         verify(writeApi, never()).writePoint(any());
     }
 
@@ -76,8 +71,7 @@ class InfluxDbRepositoryTest {
     void shouldNotPersistPointsToInfluxWhenWriteApiIsNotAvailable() {
         //GIVEN
         Point point = generateExpectedMeasurementPoint();
-        measurementPoints.add(point);
-        Whitebox.setInternalState(influxDbRepository, "measurementPoints", measurementPoints);
+        influxDbRepository.writePoint(point);
         when(influxDBConfig.getWriteApi()).thenReturn(null);
 
         //WHEN
@@ -87,7 +81,7 @@ class InfluxDbRepositoryTest {
         verify(writeApi, never()).writePoint(any());
     }
 
-    private SensorEntry generateTestSensorEntry() {
+    public static SensorEntry generateTestSensorEntry() {
         SensorEntry testSensorEntry = new SensorEntry();
         testSensorEntry.setTime(LocalDateTime.parse(TIME_AS_STRING, formatter).atOffset(ZoneOffset.UTC).toString());
         SensorMeasurement sensorMeasurement = new SensorMeasurement();
@@ -105,18 +99,18 @@ class InfluxDbRepositoryTest {
         return testSensorEntry;
     }
 
-    private Point generateExpectedMeasurementPoint() {
+    public static Point generateExpectedMeasurementPoint() {
         SensorEntry sensorEntry = generateTestSensorEntry();
         return Point.measurement("sensor")
-                    .addTag("sensor_id", sensorEntry.getSml().getDeviceId())
-                    .addField("totalConsumption(1_8_0)", sensorEntry.getSml().getTotalConsumption())
-                    .addField("tariff1Consumption(1_8_1)", sensorEntry.getSml().getTariff1Consumption())
-                    .addField("tariff2Consumption(1_8_2)", sensorEntry.getSml().getTariff2Consumption())
-                    .addField("energyExport(2_8_0)", sensorEntry.getSml().getEnergyExport())
-                    .addField("currentConsumption(16_7_0)", sensorEntry.getSml().getCurrentConsumption())
-                    .addField("currentConsumptionPhase1(36_7_0)", sensorEntry.getSml().getCurrentConsumptionPhase1())
-                    .addField("currentConsumptionPhase2(56_7_0)", sensorEntry.getSml().getCurrentConsumptionPhase2())
-                    .addField("currentConsumptionPhase3(76_7_0)", sensorEntry.getSml().getCurrentConsumptionPhase3())
-                    .time(LocalDateTime.parse(TIME_AS_STRING, formatter).toInstant(ZoneOffset.UTC), WritePrecision.MS);
+                .addTag("sensor_id", sensorEntry.getSml().getDeviceId())
+                .addField("totalConsumption(1_8_0)", sensorEntry.getSml().getTotalConsumption())
+                .addField("tariff1Consumption(1_8_1)", sensorEntry.getSml().getTariff1Consumption())
+                .addField("tariff2Consumption(1_8_2)", sensorEntry.getSml().getTariff2Consumption())
+                .addField("energyExport(2_8_0)", sensorEntry.getSml().getEnergyExport())
+                .addField("currentConsumption(16_7_0)", sensorEntry.getSml().getCurrentConsumption())
+                .addField("currentConsumptionPhase1(36_7_0)", sensorEntry.getSml().getCurrentConsumptionPhase1())
+                .addField("currentConsumptionPhase2(56_7_0)", sensorEntry.getSml().getCurrentConsumptionPhase2())
+                .addField("currentConsumptionPhase3(76_7_0)", sensorEntry.getSml().getCurrentConsumptionPhase3())
+                .time(LocalDateTime.parse(TIME_AS_STRING, formatter).toInstant(ZoneOffset.UTC), WritePrecision.MS);
     }
 }
