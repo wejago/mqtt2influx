@@ -1,638 +1,712 @@
 {
-    "annotations": {
-        "list": [
-            {
-                "builtIn": 1,
-                "datasource": {
-                    "type": "grafana",
-                    "uid": "-- Grafana --"
-                },
-                "enable": true,
-                "hide": true,
-                "iconColor": "rgba(0, 211, 255, 1)",
-                "name": "Annotations & Alerts",
-                "target": {
-                    "limit": 100,
-                    "matchAny": false,
-                    "tags": [],
-                    "type": "dashboard"
-                },
-                "type": "dashboard"
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "target": {
+          "limit": 100,
+          "matchAny": false,
+          "tags": [],
+          "type": "dashboard"
+        },
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "P951FEA4DE68E13C5"
+      },
+      "description": "consumption for the past 24 hours",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
             }
-        ]
-    },
-    "editable": true,
-    "fiscalYearStartMonth": 0,
-    "graphTooltip": 0,
-    "id": 1,
-    "links": [],
-    "liveNow": false,
-    "panels": [
-        {
-            "datasource": {
-                "type": "influxdb",
-                "uid": "P951FEA4DE68E13C5"
-            },
-            "description": "consumption for the past 24 hours",
-            "fieldConfig": {
-                "defaults": {
-                    "color": {
-                        "mode": "palette-classic"
-                    },
-                    "custom": {
-                        "axisCenteredZero": false,
-                        "axisColorMode": "text",
-                        "axisLabel": "",
-                        "axisPlacement": "auto",
-                        "barAlignment": 0,
-                        "drawStyle": "line",
-                        "fillOpacity": 0,
-                        "gradientMode": "none",
-                        "hideFrom": {
-                            "legend": false,
-                            "tooltip": false,
-                            "viz": false
-                        },
-                        "lineInterpolation": "linear",
-                        "lineWidth": 1,
-                        "pointSize": 5,
-                        "scaleDistribution": {
-                            "type": "linear"
-                        },
-                        "showPoints": "auto",
-                        "spanNulls": false,
-                        "stacking": {
-                            "group": "A",
-                            "mode": "none"
-                        },
-                        "thresholdsStyle": {
-                            "mode": "off"
-                        }
-                    },
-                    "mappings": [],
-                    "thresholds": {
-                        "mode": "absolute",
-                        "steps": [
-                            {
-                                "color": "green",
-                                "value": null
-                            }
-                        ]
-                    },
-                    "unit": "watt"
-                },
-                "overrides": []
-            },
-            "gridPos": {
-                "h": 8,
-                "w": 12,
-                "x": 0,
-                "y": 0
-            },
-            "id": 6,
-            "options": {
-                "legend": {
-                    "calcs": [],
-                    "displayMode": "list",
-                    "placement": "bottom",
-                    "showLegend": true
-                },
-                "timezone": [
-                    "Europe/Berlin"
-                ],
-                "tooltip": {
-                    "mode": "single",
-                    "sort": "none"
-                }
-            },
-            "targets": [
-                {
-                    "datasource": {
-                        "type": "influxdb",
-                        "uid": "P951FEA4DE68E13C5"
-                    },
-                    "key": "Q-682c70ca-0bfa-4ddb-a838-e6349169f5bd-0",
-                    "query": "from(bucket: \"hichi\")\r\n  |> range(start: -24h)\r\n  |> filter(fn: (r) =>\r\n    r._measurement == \"sensor\" and\r\n    r._field == \"currentConsumption(16_7_0)\"\r\n  )",
-                    "refId": "A"
-                }
-            ],
-            "title": "Consumption for the past 24 hours",
-            "type": "timeseries"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "watt"
         },
-        {
-            "datasource": {
-                "type": "influxdb",
-                "uid": "P951FEA4DE68E13C5"
-            },
-            "description": "consumption per hour for the past 24 hours",
-            "fieldConfig": {
-                "defaults": {
-                    "color": {
-                        "mode": "palette-classic"
-                    },
-                    "custom": {
-                        "axisCenteredZero": false,
-                        "axisColorMode": "text",
-                        "axisLabel": "",
-                        "axisPlacement": "auto",
-                        "fillOpacity": 80,
-                        "gradientMode": "none",
-                        "hideFrom": {
-                            "legend": false,
-                            "tooltip": false,
-                            "viz": false
-                        },
-                        "lineWidth": 1,
-                        "scaleDistribution": {
-                            "type": "linear"
-                        },
-                        "thresholdsStyle": {
-                            "mode": "off"
-                        }
-                    },
-                    "mappings": [],
-                    "thresholds": {
-                        "mode": "absolute",
-                        "steps": [
-                            {
-                                "color": "green",
-                                "value": null
-                            }
-                        ]
-                    },
-                    "unit": "watt"
-                },
-                "overrides": []
-            },
-            "gridPos": {
-                "h": 8,
-                "w": 12,
-                "x": 12,
-                "y": 0
-            },
-            "hidetimeoverride": true,
-            "id": 8,
-            "options": {
-                "barRadius": 0,
-                "barWidth": 0.97,
-                "fullHighlight": false,
-                "groupWidth": 0.7,
-                "legend": {
-                    "calcs": [],
-                    "displayMode": "list",
-                    "placement": "bottom",
-                    "showLegend": true
-                },
-                "orientation": "auto",
-                "showValue": "auto",
-                "stacking": "none",
-                "tooltip": {
-                    "mode": "single",
-                    "sort": "none"
-                },
-                "xTickLabelRotation": 0,
-                "xTickLabelSpacing": 100
-            },
-            "targets": [
-                {
-                    "datasource": {
-                        "type": "influxdb",
-                        "uid": "P951FEA4DE68E13C5"
-                    },
-                    "key": "Q-682c70ca-0bfa-4ddb-a838-e6349169f5bd-0",
-                    "query": "import \"timezone\"\r\nimport \"date\"\r\n\r\noption location = timezone.location(name: \"Europe/Berlin\")\r\nts2 = date.sub(from: today(), d: 1d)\r\nte2 = date.sub(from: ts2, d: -24h)\r\n\r\nfrom(bucket: \"hichi\")\r\n  |> range(start: ts2, stop: te2)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"sensor\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"currentConsumption(16_7_0)\")\r\n  |> aggregateWindow(every: 1h, fn: mean)",
-                    "refId": "A"
-                }
-            ],
-            "timeTo": "now-1d/d",
-            "title": "Average consumption for the past day",
-            "type": "barchart"
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      },
+      "id": 6,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
         },
-        {
-            "datasource": {
-                "type": "influxdb",
-                "uid": "P951FEA4DE68E13C5"
-            },
-            "description": "consumption per hour for the past 24 hours",
-            "fieldConfig": {
-                "defaults": {
-                    "color": {
-                        "mode": "palette-classic"
-                    },
-                    "custom": {
-                        "axisCenteredZero": false,
-                        "axisColorMode": "text",
-                        "axisLabel": "",
-                        "axisPlacement": "auto",
-                        "fillOpacity": 80,
-                        "gradientMode": "none",
-                        "hideFrom": {
-                            "legend": false,
-                            "tooltip": false,
-                            "viz": false
-                        },
-                        "lineWidth": 1,
-                        "scaleDistribution": {
-                            "type": "linear"
-                        },
-                        "thresholdsStyle": {
-                            "mode": "off"
-                        }
-                    },
-                    "mappings": [],
-                    "thresholds": {
-                        "mode": "absolute",
-                        "steps": [
-                            {
-                                "color": "green",
-                                "value": null
-                            }
-                        ]
-                    },
-                    "unit": "watt"
-                },
-                "overrides": []
-            },
-            "gridPos": {
-                "h": 8,
-                "w": 12,
-                "x": 0,
-                "y": 8
-            },
-            "id": 1,
-            "options": {
-                "barRadius": 0,
-                "barWidth": 0.97,
-                "fullHighlight": false,
-                "groupWidth": 0.7,
-                "legend": {
-                    "calcs": [],
-                    "displayMode": "list",
-                    "placement": "bottom",
-                    "showLegend": true
-                },
-                "orientation": "auto",
-                "showValue": "always",
-                "stacking": "none",
-                "tooltip": {
-                    "mode": "single",
-                    "sort": "none"
-                },
-                "xTickLabelRotation": 0,
-                "xTickLabelSpacing": 0
-            },
-            "targets": [
-                {
-                    "datasource": {
-                        "type": "influxdb",
-                        "uid": "P951FEA4DE68E13C5"
-                    },
-                    "key": "Q-682c70ca-0bfa-4ddb-a838-e6349169f5bd-0",
-                    "query": "from(bucket: \"hichi\")\r\n  |> range(start: -24h)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"sensor\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"currentConsumption(16_7_0)\")\r\n  |> aggregateWindow(every: 1h, fn: mean)",
-                    "refId": "A"
-                }
-            ],
-            "title": "Average consumption for the last 24 hours",
-            "type": "barchart"
-        },
-        {
-            "datasource": {
-                "type": "influxdb",
-                "uid": "P951FEA4DE68E13C5"
-            },
-            "description": "mid consumption per hour for a day based on the past 12 months",
-            "fieldConfig": {
-                "defaults": {
-                    "color": {
-                        "mode": "palette-classic"
-                    },
-                    "custom": {
-                        "axisCenteredZero": false,
-                        "axisColorMode": "text",
-                        "axisLabel": "",
-                        "axisPlacement": "auto",
-                        "fillOpacity": 80,
-                        "gradientMode": "none",
-                        "hideFrom": {
-                            "legend": false,
-                            "tooltip": false,
-                            "viz": false
-                        },
-                        "lineWidth": 1,
-                        "scaleDistribution": {
-                            "type": "linear"
-                        },
-                        "thresholdsStyle": {
-                            "mode": "off"
-                        }
-                    },
-                    "mappings": [
-                        {
-                            "options": {
-                                "1": {
-                                    "index": 0,
-                                    "text": "1h"
-                                },
-                                "2": {
-                                    "index": 1,
-                                    "text": "2h"
-                                }
-                            },
-                            "type": "value"
-                        }
-                    ],
-                    "thresholds": {
-                        "mode": "absolute",
-                        "steps": [
-                            {
-                                "color": "green",
-                                "value": null
-                            }
-                        ]
-                    },
-                    "unit": "watt"
-                },
-                "overrides": []
-            },
-            "gridPos": {
-                "h": 8,
-                "w": 12,
-                "x": 12,
-                "y": 8
-            },
-            "id": 5,
-            "options": {
-                "barRadius": 0,
-                "barWidth": 0.9,
-                "colorByField": "hour",
-                "fullHighlight": false,
-                "groupWidth": 0.7,
-                "legend": {
-                    "calcs": [
-                        "mean"
-                    ],
-                    "displayMode": "list",
-                    "placement": "bottom",
-                    "showLegend": false
-                },
-                "orientation": "auto",
-                "showValue": "auto",
-                "stacking": "none",
-                "tooltip": {
-                    "mode": "multi",
-                    "sort": "none"
-                },
-                "xField": "hour",
-                "xTickLabelRotation": 0,
-                "xTickLabelSpacing": 0
-            },
-            "pluginVersion": "9.4.1",
-            "targets": [
-                {
-                    "datasource": {
-                        "type": "influxdb",
-                        "uid": "P951FEA4DE68E13C5"
-                    },
-                    "query": "import \"date\"\r\nimport \"timezone\"\r\noption location = timezone.location(name: \"Europe/Berlin\")\r\n\r\nfrom(bucket: \"hichi\")\r\n  |> range(start: -1y)\r\n  |> filter(fn: (r) =>\r\n    r._measurement == \"sensor\"  and\r\n    r._field == \"currentConsumption(16_7_0)\"\r\n  )\r\n  |> map(fn: (r) => ({ r with hour: date.hour(t: r._time) }))\r\n  |> group(columns: [\"hour\"], mode:\"by\")\r\n  |> mean(column: \"_value\") \r\n  |> group()\r\n  |> sort(columns: [\"hour\"])",
-                    "refId": "A"
-                }
-            ],
-            "title": "Average Hourly Consumption - past 12 months",
-            "transformations": [
-                {
-                    "id": "convertFieldType",
-                    "options": {
-                        "conversions": [
-                            {
-                                "dateFormat": "H",
-                                "destinationType": "string",
-                                "targetField": "hour"
-                            }
-                        ],
-                        "fields": {}
-                    }
-                }
-            ],
-            "type": "barchart"
-        },
-        {
-            "datasource": {
-                "type": "influxdb",
-                "uid": "P951FEA4DE68E13C5"
-            },
-            "description": "consumption per week for the past 12 months",
-            "fieldConfig": {
-                "defaults": {
-                    "color": {
-                        "mode": "palette-classic"
-                    },
-                    "custom": {
-                        "axisCenteredZero": false,
-                        "axisColorMode": "text",
-                        "axisLabel": "",
-                        "axisPlacement": "auto",
-                        "fillOpacity": 80,
-                        "gradientMode": "none",
-                        "hideFrom": {
-                            "legend": false,
-                            "tooltip": false,
-                            "viz": false
-                        },
-                        "lineWidth": 1,
-                        "scaleDistribution": {
-                            "type": "linear"
-                        },
-                        "thresholdsStyle": {
-                            "mode": "off"
-                        }
-                    },
-                    "mappings": [],
-                    "thresholds": {
-                        "mode": "absolute",
-                        "steps": [
-                            {
-                                "color": "green",
-                                "value": null
-                            }
-                        ]
-                    },
-                    "unit": "watt"
-                },
-                "overrides": [
-                    {
-                        "matcher": {
-                            "id": "byName",
-                            "options": "Time"
-                        },
-                        "properties": [
-                            {
-                                "id": "unit",
-                                "value": "time: W"
-                            }
-                        ]
-                    }
-                ]
-            },
-            "gridPos": {
-                "h": 8,
-                "w": 24,
-                "x": 0,
-                "y": 16
-            },
-            "hidetimeoverride": true,
-            "id": 3,
-            "options": {
-                "barRadius": 0,
-                "barWidth": 0.97,
-                "fullHighlight": false,
-                "groupWidth": 0.7,
-                "legend": {
-                    "calcs": [],
-                    "displayMode": "list",
-                    "placement": "bottom",
-                    "showLegend": true
-                },
-                "orientation": "auto",
-                "showValue": "auto",
-                "stacking": "none",
-                "tooltip": {
-                    "mode": "single",
-                    "sort": "none"
-                },
-                "xField": "Time",
-                "xTickLabelRotation": 0,
-                "xTickLabelSpacing": 0
-            },
-            "targets": [
-                {
-                    "datasource": {
-                        "type": "influxdb",
-                        "uid": "P951FEA4DE68E13C5"
-                    },
-                    "query": "// v.windowPeriod is a variable referring to the current optimized window period (currently: $interval)\r\nimport \"timezone\"\r\noption location = timezone.location(name: \"Europe/Berlin\")\r\n\r\nfrom(bucket: \"hichi\")\r\n  |> range(start: - 12mo)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"sensor\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"currentConsumption(16_7_0)\")\r\n  |> aggregateWindow(every: 1h, fn: mean)\r\n  |> aggregateWindow(every: 1w, offset: -3d, fn: sum)\r\n  |> yield(name: \"some-name\")",
-                    "refId": "A"
-                }
-            ],
-            "timeTo": "now-1w/w",
-            "title": "Weekly consumption",
-            "type": "barchart"
-        },
-        {
-            "datasource": {
-                "type": "influxdb",
-                "uid": "P951FEA4DE68E13C5"
-            },
-            "description": "consumption per month for the past 12 months",
-            "fieldConfig": {
-                "defaults": {
-                    "color": {
-                        "mode": "palette-classic"
-                    },
-                    "custom": {
-                        "axisCenteredZero": false,
-                        "axisColorMode": "text",
-                        "axisLabel": "",
-                        "axisPlacement": "auto",
-                        "fillOpacity": 80,
-                        "gradientMode": "none",
-                        "hideFrom": {
-                            "legend": false,
-                            "tooltip": false,
-                            "viz": false
-                        },
-                        "lineWidth": 1,
-                        "scaleDistribution": {
-                            "type": "linear"
-                        },
-                        "thresholdsStyle": {
-                            "mode": "off"
-                        }
-                    },
-                    "mappings": [],
-                    "thresholds": {
-                        "mode": "absolute",
-                        "steps": [
-                            {
-                                "color": "green"
-                            }
-                        ]
-                    },
-                    "unit": "watt"
-                },
-                "overrides": [
-                    {
-                        "matcher": {
-                            "id": "byName",
-                            "options": "Time"
-                        },
-                        "properties": [
-                            {
-                                "id": "unit",
-                                "value": "time: MM.YY"
-                            }
-                        ]
-                    }
-                ]
-            },
-            "gridPos": {
-                "h": 9,
-                "w": 24,
-                "x": 0,
-                "y": 24
-            },
-            "hideTimeOverride": false,
-            "id": 7,
-            "options": {
-                "barRadius": 0,
-                "barWidth": 0.97,
-                "fullHighlight": false,
-                "groupWidth": 0.7,
-                "legend": {
-                    "calcs": [],
-                    "displayMode": "list",
-                    "placement": "bottom",
-                    "showLegend": true
-                },
-                "orientation": "auto",
-                "showValue": "auto",
-                "stacking": "none",
-                "tooltip": {
-                    "mode": "single",
-                    "sort": "none"
-                },
-                "xTickLabelRotation": 0,
-                "xTickLabelSpacing": -100
-            },
-            "targets": [
-                {
-                    "datasource": {
-                        "type": "influxdb",
-                        "uid": "P951FEA4DE68E13C5"
-                    },
-                    "query": "// v.windowPeriod is a variable referring to the current optimized window period (currently: $interval)\r\nimport \"timezone\"\r\noption location = timezone.location(name: \"Europe/Berlin\")\r\n\r\nfrom(bucket: \"hichi\")\r\n  |> range(start: -12mo)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"sensor\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"currentConsumption(16_7_0)\")\r\n  |> aggregateWindow(every: 1h, fn: mean)\r\n  |> aggregateWindow(every: 1mo, fn: sum)",
-                    "refId": "A"
-                }
-            ],
-            "title": "Monthly consumption",
-            "type": "barchart"
+        "timezone": [
+          "Europe/Berlin"
+        ],
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
         }
-    ],
-    "refresh": "",
-    "revision": 1,
-    "schemaVersion": 38,
-    "style": "dark",
-    "tags": [],
-    "templating": {
-        "list": []
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "P951FEA4DE68E13C5"
+          },
+          "key": "Q-682c70ca-0bfa-4ddb-a838-e6349169f5bd-0",
+          "query": "from(bucket: \"hichi\")\r\n  |> range(start: -24h)\r\n  |> filter(fn: (r) =>\r\n    r._measurement == \"sensor\" and\r\n    r._field == \"currentConsumption(16_7_0)\"\r\n  )",
+          "refId": "A"
+        }
+      ],
+      "title": "Consumption for the past 24 hours",
+      "type": "timeseries"
     },
-    "time": {
-        "from": "now-24h",
-        "to": "now"
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "P951FEA4DE68E13C5"
+      },
+      "description": "consumption per hour for the past 24 hours",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "watt"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 0
+      },
+      "hidetimeoverride": true,
+      "id": 8,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.97,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "auto",
+        "showValue": "auto",
+        "stacking": "none",
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        },
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "P951FEA4DE68E13C5"
+          },
+          "key": "Q-682c70ca-0bfa-4ddb-a838-e6349169f5bd-0",
+          "query": "import \"timezone\"\r\nimport \"date\"\r\n\r\noption location = timezone.location(name: \"Europe/Berlin\")\r\nts2 = date.sub(from: today(), d: 1d)\r\nte2 = date.sub(from: ts2, d: -24h)\r\n\r\nfrom(bucket: \"hichi\")\r\n  |> range(start: ts2, stop: te2)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"sensor\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"currentConsumption(16_7_0)\")\r\n  |> aggregateWindow(every: 1h, fn: mean)",
+          "refId": "A"
+        }
+      ],
+      "timeTo": "now-1d/d",
+      "title": "Average consumption for the past day",
+      "type": "barchart"
     },
-    "timepicker": {},
-    "timezone": "utc",
-    "title": "Hichi dashboard 1",
-    "uid": "Md5SfoxVk",
-    "version": 60,
-    "weekStart": ""
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "P951FEA4DE68E13C5"
+      },
+      "description": "consumption per hour for the past 24 hours",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "watt"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 8
+      },
+      "id": 1,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.97,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "auto",
+        "showValue": "always",
+        "stacking": "none",
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        },
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "P951FEA4DE68E13C5"
+          },
+          "key": "Q-682c70ca-0bfa-4ddb-a838-e6349169f5bd-0",
+          "query": "from(bucket: \"hichi\")\r\n  |> range(start: -24h)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"sensor\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"currentConsumption(16_7_0)\")\r\n  |> aggregateWindow(every: 1h, fn: mean)",
+          "refId": "A"
+        }
+      ],
+      "title": "Average consumption for the last 24 hours",
+      "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "P951FEA4DE68E13C5"
+      },
+      "description": "mid consumption per hour for a day based on the past 12 months",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisPlacement": "auto",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [
+            {
+              "options": {
+                "0": {
+                  "index": 0,
+                  "text": "00:00"
+                },
+                "1": {
+                  "index": 1,
+                  "text": "01:00"
+                },
+                "2": {
+                  "index": 2,
+                  "text": "02:00"
+                },
+                "3": {
+                  "index": 3,
+                  "text": "03:00"
+                },
+                "4": {
+                  "index": 4,
+                  "text": "04:00"
+                },
+                "5": {
+                  "index": 5,
+                  "text": "05:00"
+                },
+                "6": {
+                  "index": 6,
+                  "text": "06:00"
+                },
+                "7": {
+                  "index": 7,
+                  "text": "07:00"
+                },
+                "8": {
+                  "index": 8,
+                  "text": "08:00"
+                },
+                "9": {
+                  "index": 9,
+                  "text": "09:00"
+                },
+                "10": {
+                  "index": 10,
+                  "text": "10:00"
+                },
+                "11": {
+                  "index": 11,
+                  "text": "11:00"
+                },
+                "12": {
+                  "index": 12,
+                  "text": "12:00"
+                },
+                "13": {
+                  "index": 13,
+                  "text": "13:00"
+                },
+                "14": {
+                  "index": 14,
+                  "text": "14:00"
+                },
+                "15": {
+                  "index": 15,
+                  "text": "15:00"
+                },
+                "16": {
+                  "index": 16,
+                  "text": "16:00"
+                },
+                "17": {
+                  "index": 17,
+                  "text": "17:00"
+                },
+                "18": {
+                  "index": 18,
+                  "text": "18:00"
+                },
+                "19": {
+                  "index": 19,
+                  "text": "19:00"
+                },
+                "20": {
+                  "index": 20,
+                  "text": "20:00"
+                },
+                "21": {
+                  "index": 21,
+                  "text": "21:00"
+                },
+                "22": {
+                  "index": 22,
+                  "text": "22:00"
+                },
+                "23": {
+                  "index": 23,
+                  "text": "23:00"
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "watt"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 8
+      },
+      "id": 5,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.97,
+        "colorByField": "hour",
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [
+            "mean"
+          ],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "orientation": "auto",
+        "showValue": "always",
+        "stacking": "none",
+        "text": {},
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        },
+        "xField": "hour",
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
+      },
+      "pluginVersion": "9.4.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "P951FEA4DE68E13C5"
+          },
+          "query": "import \"date\"\r\nimport \"timezone\"\r\noption location = timezone.location(name: \"Europe/Berlin\")\r\n\r\nfrom(bucket: \"hichi\")\r\n  |> range(start: -1y)\r\n  |> filter(fn: (r) =>\r\n    r._measurement == \"sensor\"  and\r\n    r._field == \"currentConsumption(16_7_0)\"\r\n  )\r\n  |> map(fn: (r) => ({ r with hour: date.hour(t: r._time) }))\r\n  |> group(columns: [\"hour\"], mode:\"by\")\r\n  |> mean(column: \"_value\") \r\n  |> group()\r\n",
+          "refId": "A"
+        }
+      ],
+      "title": "Average Hourly Consumption - past 12 months",
+      "transformations": [],
+      "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "P951FEA4DE68E13C5"
+      },
+      "description": "consumption per week for the past 12 months",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "watt"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Time"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "time: W"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 16
+      },
+      "hidetimeoverride": true,
+      "id": 3,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.97,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "auto",
+        "showValue": "always",
+        "stacking": "none",
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        },
+        "xField": "Time",
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "P951FEA4DE68E13C5"
+          },
+          "query": "// v.windowPeriod is a variable referring to the current optimized window period (currently: $interval)\r\nimport \"timezone\"\r\noption location = timezone.location(name: \"Europe/Berlin\")\r\n\r\nfrom(bucket: \"hichi\")\r\n  |> range(start: - 12mo)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"sensor\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"currentConsumption(16_7_0)\")\r\n  |> aggregateWindow(every: 1h, fn: mean)\r\n  |> aggregateWindow(every: 1w, offset: -3d, fn: sum)\r\n  |> yield(name: \"some-name\")",
+          "refId": "A"
+        }
+      ],
+      "timeTo": "now-1w/w",
+      "title": "Weekly consumption",
+      "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "P951FEA4DE68E13C5"
+      },
+      "description": "consumption per month for the past 12 months",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "watt"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Time"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "time: MM.YY"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 24
+      },
+      "hideTimeOverride": false,
+      "id": 7,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.97,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "auto",
+        "showValue": "auto",
+        "stacking": "none",
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        },
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": -100
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "P951FEA4DE68E13C5"
+          },
+          "query": "// v.windowPeriod is a variable referring to the current optimized window period (currently: $interval)\r\nimport \"timezone\"\r\noption location = timezone.location(name: \"Europe/Berlin\")\r\n\r\nfrom(bucket: \"hichi\")\r\n  |> range(start: -12mo)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"sensor\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"currentConsumption(16_7_0)\")\r\n  |> aggregateWindow(every: 1h, fn: mean)\r\n  |> aggregateWindow(every: 1mo, fn: sum)",
+          "refId": "A"
+        }
+      ],
+      "title": "Monthly consumption",
+      "type": "barchart"
+    }
+  ],
+  "refresh": "",
+  "revision": 1,
+  "schemaVersion": 38,
+  "style": "dark",
+  "tags": [],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-24h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "utc",
+  "title": "Hichi dashboard 1",
+  "uid": "Md5SfoxVk",
+  "version": 1,
+  "weekStart": ""
 }

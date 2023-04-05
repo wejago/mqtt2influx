@@ -2,6 +2,9 @@ version: "3"
 services:
   mosquitto:
     image: eclipse-mosquitto
+    configs:
+      - source: mqtt
+        target: mqtt2influx-configuration.yaml
     container_name: mosquitto
     ports:
       - 1883:1883
@@ -77,6 +80,8 @@ services:
     networks:
       - mqtt2influxdb-network
     restart: unless-stopped
-
+configs:
+  mqtt:
+    external: true
 networks:
   mqtt2influxdb-network:

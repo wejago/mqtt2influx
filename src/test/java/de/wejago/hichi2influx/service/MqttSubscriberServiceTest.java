@@ -1,4 +1,4 @@
-package de.wejago.hichi2influx.unit;
+package de.wejago.hichi2influx.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -24,7 +24,7 @@ import org.springframework.boot.test.system.CapturedOutput;
 import org.springframework.boot.test.system.OutputCaptureExtension;
 
 @ExtendWith({OutputCaptureExtension.class, MockitoExtension.class})
-public class MqttSubscriberServiceTest {
+class MqttSubscriberServiceTest {
     private final String TOPIC_TEST = "topic/test";
     @Mock
     private IMqttClient mqttClient;
