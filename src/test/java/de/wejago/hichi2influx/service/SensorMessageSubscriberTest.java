@@ -1,22 +1,27 @@
-package de.wejago.hichi2influx.unit;
-
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
+package de.wejago.hichi2influx.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.influxdb.client.write.Point;
 import de.wejago.hichi2influx.dto.SensorEntry;
 import de.wejago.hichi2influx.repository.InfluxDbRepository;
-import de.wejago.hichi2influx.service.SensorMessageSubscriber;
+import de.wejago.hichi2influx.repository.InfluxDbRepositoryTest;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
+
 @ExtendWith(MockitoExtension.class)
-public class SensorMessageSubscriberTest {
+class SensorMessageSubscriberTest {
+
     @Mock
     private ObjectMapper objectMapper;
 
@@ -29,15 +34,21 @@ public class SensorMessageSubscriberTest {
     @Test
     void messageArrived_withValidMessage_writesPointToInfluxDbRepository() throws Exception {
         // GIVEN
-        String receivedMessage = "{\"Time\":\"2023-02-12T21:29:36\",\"SML\":{\"1_8_0\":22417.98}}";
-        SensorEntry expectedSensorEntry = new SensorEntry();
+        String receivedMessage = "{\"Time\":\"2023-02-16T02:25:32\",\"SML\":{\"1_8_0\":22417.98}}".trim();
+        SensorEntry expectedSensorEntry = InfluxDbRepositoryTest.generateTestSensorEntry();
         when(objectMapper.readValue(receivedMessage, SensorEntry.class)).thenReturn(expectedSensorEntry);
 
         // WHEN
         subscriber.messageArrived("test", new MqttMessage(receivedMessage.getBytes()));
 
         // THEN
-        verify(influxDbRepository).writePoint(expectedSensorEntry);
+        ArgumentCaptor<Point> captor = ArgumentCaptor.forClass(Point.class);
+        verify(influxDbRepository, times(1))
+                .writePoint(captor.capture());
+        assertThat(captor.getValue())
+                .usingRecursiveComparison()
+                .ignoringFields("time")
+                .isEqualTo(InfluxDbRepositoryTest.generateExpectedMeasurementPoint());
     }
 
     @Test
