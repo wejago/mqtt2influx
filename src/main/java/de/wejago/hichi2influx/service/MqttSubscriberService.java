@@ -28,7 +28,9 @@ public class MqttSubscriberService {
     public void postConstruct() {
         try {
             mqttClient.connect(mqttConnectOptions);
+            log.info("topic: " + mqttProperties.getTopic() + " topic2: " + mqttProperties.getTopic2());
             mqttClient.subscribe(mqttProperties.getTopic(), sensorMessageSubscriber);
+            mqttClient.subscribe(mqttProperties.getTopic2(), sensorMessageSubscriber);
             log.info("Successfully connected to MQTT client!");
         } catch (MqttException e) {
             log.error("Error connecting to MQTT client!", e);
