@@ -1,8 +1,16 @@
 package de.wejago.hichi2influx.repository;
 
+<<<<<<< HEAD
 import com.influxdb.client.WriteApi;
 import com.influxdb.client.write.Point;
 import de.wejago.hichi2influx.config.InfluxDBConfig;
+=======
+import com.influxdb.client.InfluxDBClient;
+import com.influxdb.client.WriteApiBlocking;
+import com.influxdb.client.write.Point;
+import de.wejago.hichi2influx.config.InfluxDBConfig;
+import de.wejago.hichi2influx.dto.BaseSensorEntry;
+>>>>>>> 19665a3 ((wip) prepare working version)
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -21,6 +29,7 @@ public class InfluxDbRepository {
     private final InfluxDBConfig influxDBConfig;
     private final Queue<Point> measurementPoints = new ConcurrentLinkedQueue<>();
 
+<<<<<<< HEAD
     public void writePoint(Point point) {
         measurementPoints.add(point);
     }
@@ -41,6 +50,24 @@ public class InfluxDbRepository {
                     log.info("writePoint() wrote : " + numberOfPointsWritten + " point(s).");
                 }
             }
+=======
+    private InfluxDBClient influxDBClient;
+
+    public Point writePoint(BaseSensorEntry sensorEntry) {
+        updateConnectionIfNeeded();
+        WriteApiBlocking writeApi = influxDBClient.getWriteApiBlocking();
+
+        Point point = sensorEntry.generateMeasurementPoint();
+        writeApi.writePoint(point);
+
+        return point;
+    }
+
+    private void updateConnectionIfNeeded() {
+        //set the connection only if it is empty of not active
+        if (influxDBClient == null || !influxDBClient.ping()) {
+            influxDBClient = influxDBConfig.dbConnection();
+>>>>>>> 19665a3 ((wip) prepare working version)
         }
     }
 }
