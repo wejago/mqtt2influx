@@ -21,32 +21,16 @@ public class SensorMessageSubscriber implements IMqttMessageListener {
     private final ObjectMapper objectMapper;
     private final InfluxDbRepository influxDbRepository;
 
-<<<<<<< HEAD
     @Override public void messageArrived(String s, MqttMessage mqttMessage) {
         try {
             String receivedMessage = new String(mqttMessage.getPayload());
+            log.info("Received message: " + receivedMessage);
             if (receivedMessage.contains("1_8_0")) {
-                log.info("Received message to write: " + receivedMessage);
                 SensorEntry sensorEntry = objectMapper.readValue(receivedMessage, SensorEntry.class);
-                Point point = generateMeasurementPoint(sensorEntry);
-                influxDbRepository.writePoint(point);
-=======
-        private final InfluxDbRepository influxDbRepository;
-
-        @Override public void messageArrived(String s, MqttMessage mqttMessage) {
-            try {
-                String receivedMessage = new String(mqttMessage.getPayload());
-                log.info("Received message: " + receivedMessage);
-                if(receivedMessage.contains("1_8_0")) {
-                    SensorEntry sensorEntry = objectMapper.readValue(receivedMessage, SensorEntry.class);
-                    influxDbRepository.writePoint(sensorEntry);
-                } else if(receivedMessage.contains("device_id")) {
-                    SensorEntry2 sensorEntry2 = objectMapper.readValue(receivedMessage, SensorEntry2.class);
-                    influxDbRepository.writePoint(sensorEntry2);
-                }
-            } catch (JsonProcessingException e) {
-                log.error("objectMapper JsonProcessingException" + e);
->>>>>>> 19665a3 ((wip) prepare working version)
+                influxDbRepository.writePoint(sensorEntry.generateMeasurementPoint());
+            } else if (receivedMessage.contains("device_id")) {
+                SensorEntry2 sensorEntry2 = objectMapper.readValue(receivedMessage, SensorEntry2.class);
+                influxDbRepository.writePoint(sensorEntry2.generateMeasurementPoint());
             }
         } catch (JsonProcessingException e) {
             log.error("objectMapper JsonProcessingException" + e);
