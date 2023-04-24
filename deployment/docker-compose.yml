@@ -1,4 +1,4 @@
-version: "3"
+version: "3.3"
 services:
   mosquitto:
     image: eclipse-mosquitto
@@ -17,6 +17,9 @@ services:
   mqtt2influxdb:
     container_name: mqtt2influx
     image: emowejago/mqtt2influxdb
+    configs:
+      - source: mqtt2influxdb
+        target: mqtt2influx-configuration.yaml
     ports:
       - "8181:8080"
     networks:
@@ -77,6 +80,10 @@ services:
     networks:
       - mqtt2influxdb-network
     restart: unless-stopped
+
+configs:
+  mqtt2influxdb:
+    external: true
 
 networks:
   mqtt2influxdb-network:
