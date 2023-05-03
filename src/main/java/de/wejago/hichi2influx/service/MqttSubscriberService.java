@@ -1,5 +1,6 @@
 package de.wejago.hichi2influx.service;
 
+import de.wejago.hichi2influx.config.DevicesConfig;
 import de.wejago.hichi2influx.config.MqttClientConfig;
 import de.wejago.hichi2influx.config.MqttProperties;
 import jakarta.annotation.PostConstruct;
@@ -24,9 +25,12 @@ public class MqttSubscriberService {
 
     private final MqttProperties mqttProperties;
 
+    private final DevicesConfig devicesConfig;
+
     @PostConstruct
     public void postConstruct() {
         try {
+            System.out.println(devicesConfig.getDevices().size());
             mqttClient.connect(mqttConnectOptions);
             log.info("topic: " + mqttProperties.getTopic() + " topic2: " + mqttProperties.getTopic2());
             mqttClient.subscribe(mqttProperties.getTopic(), sensorMessageSubscriber);

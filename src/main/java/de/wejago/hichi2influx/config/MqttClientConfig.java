@@ -1,5 +1,6 @@
 package de.wejago.hichi2influx.config;
 
+import java.net.InetAddress;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.client.mqttv3.IMqttClient;
@@ -18,14 +19,14 @@ import org.springframework.web.util.UriComponentsBuilder;
 public class MqttClientConfig {
     private static final String PROTOCOL_TCP = "tcp";
 
-    private static final String CLIENT_ID="hichi-2-influx-db-application";
+    private static final String CLIENT_ID= "hichi-2-influx-db-application-" + InetAddress.getLoopbackAddress().getHostName();
 
     private final MqttProperties mqttProperties;
 
     @Bean
     public IMqttClient getMqttClient() {
         try (MemoryPersistence persistence = new MemoryPersistence()) {
-            log.info("mqtt IP: " + mqttProperties.getBrokerIp() + " user: " + mqttProperties.getUsername());
+            log.info("mqtt IP: " + mqttProperties.getBrokerIp() + " user: " + mqttProperties.getUsername() + "client ID: " + CLIENT_ID);
             return new MqttClient(buildBrokerUrl(), CLIENT_ID, persistence);
         } catch (MqttException e) {
             log.error("Error connecting to MQTT client!", e);
