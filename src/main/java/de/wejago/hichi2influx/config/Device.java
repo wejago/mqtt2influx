@@ -1,12 +1,16 @@
 package de.wejago.hichi2influx.config;
 
 import java.util.Map;
+import org.springframework.stereotype.Component;
 
+@Component
 public class Device {
     private String name;
     private String type;
     private String topic;
     private String only_match;
+
+    private String sensor_id;
     private Map<String, String> mappings;
 
     public String getName() {
@@ -39,6 +43,14 @@ public class Device {
 
     public void setOnly_match(String only_match) {
         this.only_match = only_match;
+    }
+
+    public String getSensor_id() {
+        return sensor_id;
+    }
+
+    public void setSensor_id(String sensor_id) {
+        this.sensor_id = sensor_id;
     }
 
     public Map<String, String> getMappings() {
