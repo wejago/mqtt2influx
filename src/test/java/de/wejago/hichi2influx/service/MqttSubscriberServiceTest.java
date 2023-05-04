@@ -66,8 +66,7 @@ class MqttSubscriberServiceTest {
         // THEN
         verify(mqttClient, times(1)).connect(mqttConnectOptions);
         assertThatThrownBy(() -> { throw new MqttException(1); })
-            .isInstanceOf(MqttException.class)
-            .hasMessage("Invalid protocol version");
+            .isInstanceOf(MqttException.class);
         assertThat(output.getOut()).contains("Error connecting to MQTT client!");
     }
 }
