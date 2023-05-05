@@ -1,22 +1,21 @@
 package de.wejago.hichi2influx.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.influxdb.client.domain.WritePrecision;
 import com.influxdb.client.write.Point;
 import de.wejago.hichi2influx.config.Device;
 import de.wejago.hichi2influx.repository.InfluxDbRepository;
 import java.time.Instant;
+import java.util.Iterator;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.map.HashedMap;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
-import org.springframework.stereotype.Service;
 
 @Slf4j
-@Service
 @RequiredArgsConstructor
 public class JsonSubscriber extends Subscriber{
     private final ObjectMapper objectMapper;
@@ -39,24 +38,34 @@ public class JsonSubscriber extends Subscriber{
 
     private Map readDataFromMqttMessage(String receivedMessage) throws JsonProcessingException{
         log.info("Received message to write: " + receivedMessage);
-        Map<String, Object> messageMap
-            = objectMapper.readValue(receivedMessage, new TypeReference<Map<String,Object>>(){});
+        JsonNode messageNode = objectMapper.readTree(receivedMessage);
         Map<String, String> deviceMappings = device.getMappings();
+        Map<String, Object> deviceToPointProperties = convertFromStringToMap(deviceMappings, messageNode);
+
+        return deviceToPointProperties;
+    }
+
+    private Map convertFromStringToMap(Map<String, String> deviceMappings, JsonNode messageNode) {
         Map<String, Object> deviceToPointProperties = new HashedMap();
-        for (Map.Entry<String,Object> entry : messageMap.entrySet()) {
-            if(entry.getValue() instanceof Map) {
-                Map<String, String> messageValueMap = objectMapper.convertValue(entry.getValue(), Map.class);
-                for(Map.Entry<String, String> messageValueItem : messageValueMap.entrySet()) {
-                    if(deviceMappings.containsKey(messageValueItem.getKey())) {
-                        deviceToPointProperties.put(messageValueItem.getKey(), messageValueItem.getValue());
-                    }
-                }
+        for (Iterator<Map.Entry<String, JsonNode>> it = messageNode.fields(); it.hasNext(); ) {
+            Map.Entry<String, JsonNode> entry = it.next();
+            if (entry.getValue().isObject()) {
+                addMapEntriesByExistingDeviceMappings(deviceMappings, deviceToPointProperties, entry);
             } else if(deviceMappings.containsKey(entry.getValue())) {
                 deviceToPointProperties.put(entry.getKey(), entry.getValue().toString());
             }
         }
 
         return deviceToPointProperties;
+    }
+
+    private void addMapEntriesByExistingDeviceMappings(Map<String, String> deviceMappings, Map<String, Object> deviceToPointProperties, Map.Entry<String, JsonNode> entry) {
+        Map<String, String> messageValueMap = objectMapper.convertValue(entry.getValue(), Map.class);
+        for(Map.Entry<String, String> messageValueItem : messageValueMap.entrySet()) {
+            if(deviceMappings.containsKey(messageValueItem.getKey())) {
+                deviceToPointProperties.put(messageValueItem.getKey(), messageValueItem.getValue());
+            }
+        }
     }
 
     private Point generateMeasurementPoint(Map<String, Object> deviceToPointProperties) {

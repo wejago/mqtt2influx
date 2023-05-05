@@ -17,8 +17,4 @@ public class MqttProperties {
     private String username;
 
     private String password;
-
-    private String topic;
-
-    private String topic2;
 }

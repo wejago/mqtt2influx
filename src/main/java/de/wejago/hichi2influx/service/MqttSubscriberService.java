@@ -2,7 +2,6 @@ package de.wejago.hichi2influx.service;
 
 import de.wejago.hichi2influx.config.Device;
 import de.wejago.hichi2influx.config.DevicesConfig;
-import de.wejago.hichi2influx.config.MqttProperties;
 import de.wejago.hichi2influx.factory.JsonSubscriberFactory;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -16,14 +15,9 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class MqttSubscriberService {
-    private final SensorMessageSubscriber sensorMessageSubscriber;
     private final IMqttClient mqttClient;
     private final MqttConnectOptions mqttConnectOptions;
-
-    private final MqttProperties mqttProperties;
-
     private final DevicesConfig devicesConfig;
-
     private final JsonSubscriberFactory jsonSubscriberFactory;
 
     @PostConstruct
