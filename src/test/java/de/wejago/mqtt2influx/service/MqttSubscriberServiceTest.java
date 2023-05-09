@@ -1,4 +1,4 @@
-package de.wejago.hichi2influx.service;
+package de.wejago.mqtt2influx.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -7,14 +7,11 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import de.wejago.hichi2influx.config.MqttClientConfig;
-import de.wejago.hichi2influx.config.MqttProperties;
-import de.wejago.hichi2influx.service.MqttSubscriberService;
-import de.wejago.hichi2influx.service.SensorMessageSubscriber;
+import de.wejago.mqtt2influx.config.MqttProperties;
+
 import org.eclipse.paho.client.mqttv3.IMqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

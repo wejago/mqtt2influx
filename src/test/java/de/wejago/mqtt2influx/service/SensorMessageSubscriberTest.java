@@ -1,10 +1,10 @@
-package de.wejago.hichi2influx.service;
+package de.wejago.mqtt2influx.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.influxdb.client.write.Point;
-import de.wejago.hichi2influx.dto.SensorEntry;
-import de.wejago.hichi2influx.repository.InfluxDbRepository;
-import de.wejago.hichi2influx.repository.InfluxDbRepositoryTest;
+import de.wejago.mqtt2influx.dto.SensorEntry;
+import de.wejago.mqtt2influx.repository.InfluxDbRepository;
+import de.wejago.mqtt2influx.repository.InfluxDbRepositoryTest;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

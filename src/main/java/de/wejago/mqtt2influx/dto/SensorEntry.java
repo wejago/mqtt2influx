@@ -1,4 +1,4 @@
-package de.wejago.hichi2influx.dto;
+package de.wejago.mqtt2influx.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
