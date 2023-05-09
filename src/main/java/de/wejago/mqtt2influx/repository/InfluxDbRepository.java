@@ -1,8 +1,8 @@
-package de.wejago.hichi2influx.repository;
+package de.wejago.mqtt2influx.repository;
 
 import com.influxdb.client.WriteApi;
 import com.influxdb.client.write.Point;
-import de.wejago.hichi2influx.config.InfluxDBConfig;
+import de.wejago.mqtt2influx.config.InfluxDBConfig;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.EnableScheduling;

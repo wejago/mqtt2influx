@@ -1,4 +1,4 @@
-package de.wejago.hichi2influx.config;
+package de.wejago.mqtt2influx.config;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

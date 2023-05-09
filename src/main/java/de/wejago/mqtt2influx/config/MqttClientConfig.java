@@ -1,4 +1,4 @@
-package de.wejago.hichi2influx.config;
+package de.wejago.mqtt2influx.config;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +18,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 public class MqttClientConfig {
     private static final String PROTOCOL_TCP = "tcp";
 
-    private static final String CLIENT_ID="hichi-2-influx-db-application";
+    private static final String CLIENT_ID="mqtt-2-influx-db-application";
 
     private final MqttProperties mqttProperties;
 

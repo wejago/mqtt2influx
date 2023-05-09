@@ -26,5 +26,5 @@ echo \
   sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 sudo apt-get install -y docker-compose-plugin
 
-git clone https://github.com/wejago/hichi2influx.git
+git clone https://github.com/wejago/mqtt2influx.git
 

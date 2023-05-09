@@ -1,11 +1,11 @@
-package de.wejago.hichi2influx.service;
+package de.wejago.mqtt2influx.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.influxdb.client.domain.WritePrecision;
 import com.influxdb.client.write.Point;
-import de.wejago.hichi2influx.dto.SensorEntry;
-import de.wejago.hichi2influx.repository.InfluxDbRepository;
+import de.wejago.mqtt2influx.dto.SensorEntry;
+import de.wejago.mqtt2influx.repository.InfluxDbRepository;
 import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

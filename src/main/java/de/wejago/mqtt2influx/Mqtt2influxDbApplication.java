@@ -1,4 +1,4 @@
-package de.wejago.hichi2influx;
+package de.wejago.mqtt2influx;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.SpringApplication;
@@ -6,9 +6,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 @RequiredArgsConstructor
-public class Hichi2influxDbApplication {
-
+public class Mqtt2influxDbApplication {
 	public static void main(String[] args) {
-		SpringApplication.run(Hichi2influxDbApplication.class, args);
+		SpringApplication.run(Mqtt2influxDbApplication.class, args);
 	}
 }

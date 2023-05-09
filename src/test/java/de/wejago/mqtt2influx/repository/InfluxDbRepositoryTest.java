@@ -1,4 +1,4 @@
-package de.wejago.hichi2influx.repository;
+package de.wejago.mqtt2influx.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -7,26 +7,22 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.influxdb.client.InfluxDBClient;
 import com.influxdb.client.WriteApi;
 import com.influxdb.client.domain.WritePrecision;
 import com.influxdb.client.write.Point;
-import de.wejago.hichi2influx.config.InfluxDBConfig;
-import de.wejago.hichi2influx.dto.SensorEntry;
-import de.wejago.hichi2influx.dto.SensorMeasurement;
+import de.wejago.mqtt2influx.config.InfluxDBConfig;
+import de.wejago.mqtt2influx.dto.SensorEntry;
+import de.wejago.mqtt2influx.dto.SensorMeasurement;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
-import java.util.Queue;
-import java.util.concurrent.LinkedBlockingQueue;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.internal.util.reflection.Whitebox;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)

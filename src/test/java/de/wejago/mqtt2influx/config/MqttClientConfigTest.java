@@ -1,10 +1,8 @@
-package de.wejago.hichi2influx.config;
+package de.wejago.mqtt2influx.config;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
-import de.wejago.hichi2influx.config.MqttClientConfig;
-import de.wejago.hichi2influx.config.MqttProperties;
 import org.eclipse.paho.client.mqttv3.IMqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.junit.jupiter.api.Test;
@@ -39,7 +37,7 @@ class MqttClientConfigTest {
         // THEN
         assertThat(mqttClient).isNotNull();
         assertThat(mqttClient.getServerURI()).isEqualTo(BROKER);
-        assertThat(mqttClient.getClientId()).isEqualTo("hichi-2-influx-db-application");
+        assertThat(mqttClient.getClientId()).isEqualTo("mqtt-2-influx-db-application");
     }
 
     @Test
