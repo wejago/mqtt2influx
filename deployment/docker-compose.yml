@@ -19,7 +19,7 @@ services:
 
   mqtt2influxdb:
     container_name: mqtt2influx
-    image: emowejago/mqtt2influxdb
+    image: wejago/mqtt2influx
     ports:
       - "8181:8080"
     networks:
