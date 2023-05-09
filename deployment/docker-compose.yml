@@ -34,8 +34,6 @@ services:
       - INFLUX_TOKEN=${INFLUX_TOKEN}
       - MQTT_BROKER_IP=mosquitto
       - MQTT_BROKER_PORT=1883
-      - MQTT_TOPIC=tele/tasmota_FA2296/SENSOR
-      - MQTT_TOPIC2=tele/power/SENSOR
       - MQTT_USERNAME=${MQTT_USERNAME}
       - MQTT_PASSWORD=${MQTT_PASSWORD}
     env_file:
@@ -87,10 +85,6 @@ services:
 configs:
   mqtt:
     external: true
-  mqtt2influxdb:
-    external: true
-
-configs:
   mqtt2influxdb:
     external: true
 

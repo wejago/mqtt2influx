@@ -19,7 +19,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 public class MqttClientConfig {
     private static final String PROTOCOL_TCP = "tcp";
 
-    private static final String CLIENT_ID= "hichi-2-influx-db-application-" + InetAddress.getLoopbackAddress().getHostName();
+    private static final String CLIENT_ID= "mqtt-2-influx-db-application-" + InetAddress.getLoopbackAddress().getHostName();
 
     private final MqttProperties mqttProperties;
 

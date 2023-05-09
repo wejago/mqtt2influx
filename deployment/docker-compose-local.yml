@@ -48,9 +48,5 @@ configs:
   mqtt2influxdb:
     external: true
 
-configs:
-  mqtt2influxdb:
-    external: true
-
 networks:
   mqtt2influxdb-network:

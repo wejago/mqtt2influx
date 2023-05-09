@@ -1,13 +1,11 @@
 package de.wejago.hichi2influx.config;
 
 import java.util.Map;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 import org.springframework.stereotype.Component;
 
 @Component
-@Getter
-@Setter
+@Data
 public class Device {
     private String name;
     private String type;
