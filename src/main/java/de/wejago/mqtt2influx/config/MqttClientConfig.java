@@ -1,5 +1,7 @@
 package de.wejago.mqtt2influx.config;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.client.mqttv3.IMqttClient;
@@ -17,19 +19,20 @@ import org.springframework.web.util.UriComponentsBuilder;
 @RequiredArgsConstructor
 public class MqttClientConfig {
     private static final String PROTOCOL_TCP = "tcp";
-
-    private static final String CLIENT_ID="mqtt-2-influx-db-application";
-
     private final MqttProperties mqttProperties;
 
     @Bean
     public IMqttClient getMqttClient() {
         try (MemoryPersistence persistence = new MemoryPersistence()) {
-            log.info("mqtt IP: " + mqttProperties.getBrokerIp() + " user: " + mqttProperties.getUsername());
-            return new MqttClient(buildBrokerUrl(), CLIENT_ID, persistence);
+            String clientId =  "mqtt-2-influx-db-application-" + InetAddress.getLocalHost().getHostName();
+            log.info("mqtt IP: " + mqttProperties.getBrokerIp() + " user: " + mqttProperties.getUsername() + " client ID: " + clientId);
+            return new MqttClient(buildBrokerUrl(), clientId, persistence);
         } catch (MqttException e) {
             log.error("Error connecting to MQTT client!", e);
             return null;
+        } catch (UnknownHostException e) {
+            log.error("Error UnknownHostException!", e);
+            throw new RuntimeException(e);
         }
     }
 

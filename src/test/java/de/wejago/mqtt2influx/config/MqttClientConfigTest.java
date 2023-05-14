@@ -37,7 +37,7 @@ class MqttClientConfigTest {
         // THEN
         assertThat(mqttClient).isNotNull();
         assertThat(mqttClient.getServerURI()).isEqualTo(BROKER);
-        assertThat(mqttClient.getClientId()).isEqualTo("mqtt-2-influx-db-application");
+        assertThat(mqttClient.getClientId()).startsWith("mqtt-2-influx-db-application");
     }
 
     @Test
