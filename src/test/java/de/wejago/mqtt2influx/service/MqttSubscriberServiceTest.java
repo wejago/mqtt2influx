@@ -2,7 +2,10 @@ package de.wejago.mqtt2influx.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -11,6 +14,7 @@ import de.wejago.mqtt2influx.config.Device;
 import de.wejago.mqtt2influx.config.DevicesConfig;
 import de.wejago.mqtt2influx.factory.JsonSubscriberFactory;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Map;
 import org.apache.commons.collections.map.HashedMap;
 import org.eclipse.paho.client.mqttv3.IMqttClient;
@@ -24,7 +28,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.system.CapturedOutput;
 import org.springframework.boot.test.system.OutputCaptureExtension;
 
-@ExtendWith({OutputCaptureExtension.class, MockitoExtension.class})
+@ExtendWith({ OutputCaptureExtension.class, MockitoExtension.class })
 class MqttSubscriberServiceTest {
     @Mock
     private IMqttClient mqttClient;
@@ -63,17 +67,72 @@ class MqttSubscriberServiceTest {
 
         // THEN
         verify(mqttClient, times(1)).connect(mqttConnectOptions);
-        assertThatThrownBy(() -> { throw new MqttException(1); })
+        assertThatThrownBy(() -> {throw new MqttException(1);})
             .isInstanceOf(MqttException.class);
         assertThat(output.getOut()).contains("Error connecting to MQTT client!");
     }
 
+    @Test
+    void postConstruct_deviceNull() throws MqttException {
+        //GIVEN
+        when(devicesConfig.getDevices()).thenReturn(Collections.singletonList(null));
+
+        //WHEN
+        mqttSubscriberService.postConstruct();
+
+        //THEN
+        verify(mqttClient, never()).subscribe(anyString(), any());
+    }
+
+    @Test
+    void postConstruct_topicBlank() throws MqttException {
+        //GIVEN
+        Device device = initializeTestDevice(1);
+        device.setTopic("");
+
+        when(devicesConfig.getDevices()).thenReturn(Collections.singletonList(device));
+
+        //WHEN
+        mqttSubscriberService.postConstruct();
+
+        //THEN
+        verify(mqttClient, never()).subscribe(anyString(), any());
+    }
+
+    @Test
+    void postConstruct_mappingEmpty() throws MqttException {
+        //GIVEN
+        Device device = initializeTestDevice(1);
+        device.setMappings(new HashedMap());
+        when(devicesConfig.getDevices()).thenReturn(Collections.singletonList(device));
+
+        //WHEN
+        mqttSubscriberService.postConstruct();
+
+        //THEN
+        verify(mqttClient, never()).subscribe(anyString(), any());
+    }
+
+    @Test
+    void postConstruct_sensorIdBlank() throws MqttException {
+        //GIVEN
+        Device device = initializeTestDevice(1);
+        device.setSensorId("");
+        when(devicesConfig.getDevices()).thenReturn(Collections.singletonList(device));
+
+        //WHEN
+        mqttSubscriberService.postConstruct();
+
+        //THEN
+        verify(mqttClient, never()).subscribe(anyString(), any());
+    }
+
     private Device initializeTestDevice(int deviceNum) {
         Map deviceMapping = new HashedMap();
-        deviceMapping.put("key" + deviceNum, "value" + + deviceNum);
+        deviceMapping.put("key" + deviceNum, "value" + deviceNum);
         Device device = new Device();
-        device.setTopic("testTopic" + + deviceNum);
-        device.setSensorId("testSensorId" + + deviceNum);
+        device.setTopic("testTopic" + deviceNum);
+        device.setSensorId("testSensorId" + deviceNum);
         device.setMappings(deviceMapping);
 
         return device;
