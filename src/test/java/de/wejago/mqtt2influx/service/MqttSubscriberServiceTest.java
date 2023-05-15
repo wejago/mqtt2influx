@@ -7,8 +7,12 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import de.wejago.mqtt2influx.config.MqttProperties;
-
+import de.wejago.mqtt2influx.config.Device;
+import de.wejago.mqtt2influx.config.DevicesConfig;
+import de.wejago.mqtt2influx.factory.JsonSubscriberFactory;
+import java.util.Arrays;
+import java.util.Map;
+import org.apache.commons.collections.map.HashedMap;
 import org.eclipse.paho.client.mqttv3.IMqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
@@ -22,34 +26,31 @@ import org.springframework.boot.test.system.OutputCaptureExtension;
 
 @ExtendWith({OutputCaptureExtension.class, MockitoExtension.class})
 class MqttSubscriberServiceTest {
-    private final String TOPIC_TEST = "topic/test";
     @Mock
     private IMqttClient mqttClient;
-
     @Mock
     private MqttConnectOptions mqttConnectOptions;
-
     @Mock
-    private SensorMessageSubscriber sensorMessageSubscriber;
-
+    private DevicesConfig devicesConfig;
     @Mock
-    private MqttProperties mqttProperties;
-
+    private JsonSubscriberFactory jsonSubscriberFactory;
     @InjectMocks
     private MqttSubscriberService mqttSubscriberService;
 
     @Test
-    void testConnectSuccess(CapturedOutput output) throws MqttException {
-        // GIVEN
-        when(mqttProperties.getTopic()).thenReturn(TOPIC_TEST);
+    void postConstruct_success() throws MqttException {
+        //GIVEN
+        Device device1 = initializeTestDevice(1);
+        Device device2 = initializeTestDevice(2);
+        when(devicesConfig.getDevices()).thenReturn(Arrays.asList(device1, device2));
 
-        // WHEN
+        //WHEN
         mqttSubscriberService.postConstruct();
 
-        // THEN
+        //THEN
         verify(mqttClient, times(1)).connect(mqttConnectOptions);
-        verify(mqttClient, times(1)).subscribe(TOPIC_TEST, sensorMessageSubscriber);
-        assertThat(output.getOut()).contains("Successfully connected to MQTT client!");
+        verify(mqttClient, times(1)).subscribe(device1.getTopic(), jsonSubscriberFactory.create(device1));
+        verify(mqttClient, times(1)).subscribe(device2.getTopic(), jsonSubscriberFactory.create(device2));
     }
 
     @Test
@@ -65,5 +66,16 @@ class MqttSubscriberServiceTest {
         assertThatThrownBy(() -> { throw new MqttException(1); })
             .isInstanceOf(MqttException.class);
         assertThat(output.getOut()).contains("Error connecting to MQTT client!");
+    }
+
+    private Device initializeTestDevice(int deviceNum) {
+        Map deviceMapping = new HashedMap();
+        deviceMapping.put("key" + deviceNum, "value" + + deviceNum);
+        Device device = new Device();
+        device.setTopic("testTopic" + + deviceNum);
+        device.setSensorId("testSensorId" + + deviceNum);
+        device.setMappings(deviceMapping);
+
+        return device;
     }
 }

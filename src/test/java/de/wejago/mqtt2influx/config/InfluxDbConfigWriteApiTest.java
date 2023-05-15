@@ -1,11 +1,9 @@
 package de.wejago.mqtt2influx.config;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
 import com.influxdb.client.WriteApi;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 
 class InfluxDbConfigWriteApiTest {
     private final String INFLUX_URL = "http://localhost";
@@ -13,8 +11,6 @@ class InfluxDbConfigWriteApiTest {
     private final String INFLUX_ORG = "test-organization";
     private final String INFLUX_BUCKET = "test-bucket1";
 
-    @Mock
-    WriteApi writeApi;
     @InjectMocks
     InfluxDBConfig influxDBConfig;
 
