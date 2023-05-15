@@ -14,7 +14,7 @@ devices:
         '56_7_0': Current usage phase 2
         '76_7_0': Current usage phase 3
         '96_1_0': Device ID
-  - name: tele (parents Jens)
+  - name: tele (Other consumption monitor)
     type: json
     topic: tele/power/SENSOR
     sensor_id: 'device_id'

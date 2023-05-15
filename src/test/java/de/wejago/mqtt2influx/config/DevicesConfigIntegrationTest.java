@@ -31,7 +31,7 @@ class DevicesConfigIntegrationTest {
         assertEquals("Total consumption", mappings1.get("1_8_0"));
 
         Device device2 = devices.get(1);
-        assertEquals("tele (parents Jens)", device2.getName());
+        assertEquals("tele (Other consumption monitor)", device2.getName());
         assertEquals("json", device2.getType());
         assertEquals("tele/power/SENSOR", device2.getTopic());
         assertEquals("device_id", device2.getOnlyMatch());
