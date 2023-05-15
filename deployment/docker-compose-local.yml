@@ -42,11 +42,6 @@ services:
     networks:
       - mqtt2influx-network
     restart: unless-stopped
-configs:
-  mqtt:
-    external: true
-  mqtt2influxdb:
-    external: true
 
 networks:
   mqtt2influx-network:
