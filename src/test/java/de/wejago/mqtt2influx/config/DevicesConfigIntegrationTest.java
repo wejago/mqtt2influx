@@ -28,7 +28,7 @@ class DevicesConfigIntegrationTest {
         assertEquals("1_8_0", device1.getOnlyMatch());
         Map<String, String> mappings1 = device1.getMappings();
         assertEquals(9, mappings1.size());
-        assertEquals("Total consumption", mappings1.get("1_8_0"));
+        assertEquals("totalConsumption(1_8_0)", mappings1.get("1_8_0"));
 
         Device device2 = devices.get(1);
         assertEquals("tele (Other consumption monitor)", device2.getName());
@@ -37,6 +37,6 @@ class DevicesConfigIntegrationTest {
         assertEquals("device_id", device2.getOnlyMatch());
         Map<String, String> mappings2 = device2.getMappings();
         assertEquals(4, mappings2.size());
-        assertEquals("Sum received", mappings2.get("Total_in"));
+        assertEquals("Total Consumption", mappings2.get("Total_in"));
     }
 }
