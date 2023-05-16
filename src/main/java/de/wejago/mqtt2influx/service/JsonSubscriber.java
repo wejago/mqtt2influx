@@ -31,7 +31,7 @@ public class JsonSubscriber implements IMqttMessageListener {
 
             if (StringUtils.isNotBlank(device.getOnlyMatch()) && receivedMessage.contains(device.getOnlyMatch())) {
                 Map<String, Object> deviceToPointProperties = readDataFromMqttMessage(receivedMessage);
-                Point point = generateMeasurementPoint(deviceToPointProperties);
+                Point point = generateMeasurementPoint(deviceToPointProperties, device);
                 influxDbRepository.writePoint(point);
             }
         } catch (JsonProcessingException e) {
@@ -65,17 +65,18 @@ public class JsonSubscriber implements IMqttMessageListener {
         Map<String, String> messageValueMap = objectMapper.convertValue(entry.getValue(), Map.class);
         for (Map.Entry<String, String> messageValueItem : messageValueMap.entrySet()) {
             if (deviceMappings.containsKey(messageValueItem.getKey())) {
-                deviceToPointProperties.put(messageValueItem.getKey(), messageValueItem.getValue());
+                deviceToPointProperties.put(deviceMappings.get(messageValueItem.getKey()), messageValueItem.getValue());
             }
         }
     }
 
-    private Point generateMeasurementPoint(Map<String, Object> deviceToPointProperties) {
-        String sensorId = deviceToPointProperties.get(device.getSensorId()).toString();
+    private Point generateMeasurementPoint(Map<String, Object> deviceToPointProperties, Device device) {
+        String sensorId = deviceToPointProperties.get(device.getMappings().get(device.getSensorId())).toString();
         //remove the sensor_id because it is String and cannot be added to the point as a field
-        deviceToPointProperties.remove(device.getSensorId());
+        deviceToPointProperties.remove(device.getMappings().get(device.getSensorId()));
         return Point
             .measurement("sensor")
+            .addTag("device_name", device.getName())
             .addTag("sensor_id", sensorId)
             .addFields(deviceToPointProperties)
             .time(Instant.now(), WritePrecision.MS);

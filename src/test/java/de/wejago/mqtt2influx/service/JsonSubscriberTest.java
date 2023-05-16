@@ -83,8 +83,8 @@ class JsonSubscriberTest {
 
     private void buildTestDevice() {
         Map<String, String> deviceMappings = new HashMap<>();
-        deviceMappings.put("Total_in", "Total in");
-        deviceMappings.put("device_id", "test device ID");
+        deviceMappings.put("Total_in", "Total Consumption");
+        deviceMappings.put("device_id", "Device ID");
         device = new Device();
         device.setSensorId("device_id");
         device.setOnlyMatch("device_id");
@@ -94,6 +94,7 @@ class JsonSubscriberTest {
     private Point buildTestPoint() {
         return Point.measurement("sensor")
                     .addTag("sensor_id", "0a01454d480000b22b25")
-                    .addField("Total_in", 695.38);
+                    .addTag("device_name", null)
+                    .addField("Total Consumption", 695.38);
     }
 }
