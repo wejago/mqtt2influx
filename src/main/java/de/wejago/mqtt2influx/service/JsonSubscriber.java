@@ -10,6 +10,7 @@ import de.wejago.mqtt2influx.repository.InfluxDbRepository;
 import java.time.Instant;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.map.HashedMap;
@@ -20,6 +21,7 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 @Slf4j
 @RequiredArgsConstructor
 public class JsonSubscriber implements IMqttMessageListener {
+    private static final Pattern NUMBER_PATTERN = Pattern.compile("-?\\d+(\\.\\d+)?");
     private final ObjectMapper objectMapper;
     private final InfluxDbRepository influxDbRepository;
     private final Device device;
@@ -65,7 +67,18 @@ public class JsonSubscriber implements IMqttMessageListener {
         Map<String, String> messageValueMap = objectMapper.convertValue(entry.getValue(), Map.class);
         for (Map.Entry<String, String> messageValueItem : messageValueMap.entrySet()) {
             if (deviceMappings.containsKey(messageValueItem.getKey())) {
-                deviceToPointProperties.put(deviceMappings.get(messageValueItem.getKey()), messageValueItem.getValue());
+                String value = String.valueOf(messageValueItem.getValue());
+                //we store all numbers as floats in influx
+                if(NUMBER_PATTERN.matcher(value).matches()) {
+                    try{
+                        deviceToPointProperties.put(deviceMappings.get(messageValueItem.getKey()), Double.parseDouble(value));
+                    } catch(NumberFormatException | ClassCastException e){
+                        log.warn("NumberFormatException could not convert to double the value: " + messageValueItem.getValue());
+                    }
+                } else {
+                    //strings should be stored as strings
+                    deviceToPointProperties.put(deviceMappings.get(messageValueItem.getKey()), messageValueItem.getValue());
+                }
             }
         }
     }
