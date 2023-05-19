@@ -5,15 +5,15 @@ devices:
     sensor_id: '96_1_0'
     only_match: '1_8_0'
     mappings:
-      '1_8_0': totalConsumption(1_8_0)
-      '1_8_1': tariff1Consumption(1_8_1)
-      '1_8_2': tariff2Consumption(1_8_2)
-      '2_8_0': energyExport(2_8_0)
-      '16_7_0': currentConsumption(16_7_0)
-      '36_7_0': currentConsumptionPhase1(36_7_0)
-      '56_7_0': currentConsumptionPhase2(56_7_0)
-      '76_7_0': currentConsumptionPhase3(76_7_0)
-      '96_1_0': sensor_id
+      '1_8_0': Total Consumption
+      '1_8_1': Tariff 1 Consumption
+      '1_8_2': Tariff 2 Consumption
+      '2_8_0': Total Production
+      '16_7_0': Current Consumption
+      '36_7_0': Current Consumption Phase 1
+      '56_7_0': Current Consumption Phase 2
+      '76_7_0': Current Consumption Phase 3
+      '96_1_0': Device ID
   - name: tele (Other consumption monitor)
     type: json
     topic: tele/power/SENSOR
