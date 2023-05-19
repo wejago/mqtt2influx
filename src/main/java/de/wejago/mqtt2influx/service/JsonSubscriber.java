@@ -1,6 +1,7 @@
 package de.wejago.mqtt2influx.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.influxdb.client.domain.WritePrecision;
@@ -32,7 +33,8 @@ public class JsonSubscriber implements IMqttMessageListener {
             String receivedMessage = new String(mqttMessage.getPayload());
 
             if (StringUtils.isNotBlank(device.getOnlyMatch()) && receivedMessage.contains(device.getOnlyMatch())) {
-                Map<String, Object> deviceToPointProperties = readDataFromMqttMessage(receivedMessage);
+                JsonNode messageNode = objectMapper.readTree(receivedMessage);
+                Map<String, Object> deviceToPointProperties = readDeviceValuesFromMqttMessage(messageNode);
                 Point point = generateMeasurementPoint(deviceToPointProperties, device);
                 influxDbRepository.writePoint(point);
             }
@@ -41,9 +43,7 @@ public class JsonSubscriber implements IMqttMessageListener {
         }
     }
 
-    private Map<String, Object> readDataFromMqttMessage(String receivedMessage) throws JsonProcessingException {
-        log.info("Received message to write: " + receivedMessage);
-        JsonNode messageNode = objectMapper.readTree(receivedMessage);
+    private Map<String, Object> readDeviceValuesFromMqttMessage(JsonNode messageNode) {
         Map<String, String> deviceMappings = device.getMappings();
         return convertFromStringToMap(deviceMappings, messageNode);
     }
@@ -64,14 +64,14 @@ public class JsonSubscriber implements IMqttMessageListener {
 
     private void addMapEntriesByExistingDeviceMappings(Map<String, String> deviceMappings, Map<String, Object> deviceToPointProperties,
                                                        Map.Entry<String, JsonNode> entry) {
-        Map<String, String> messageValueMap = objectMapper.convertValue(entry.getValue(), Map.class);
+        Map<String, String> messageValueMap = objectMapper.convertValue(entry.getValue(), new TypeReference<>() {
+        });
         for (Map.Entry<String, String> messageValueItem : messageValueMap.entrySet()) {
             if (deviceMappings.containsKey(messageValueItem.getKey())) {
-                String value = String.valueOf(messageValueItem.getValue());
                 //we store all numbers as floats in influx
-                if(NUMBER_PATTERN.matcher(value).matches()) {
+                if(NUMBER_PATTERN.matcher(messageValueItem.getValue()).matches()) {
                     try{
-                        deviceToPointProperties.put(deviceMappings.get(messageValueItem.getKey()), Double.parseDouble(value));
+                        deviceToPointProperties.put(deviceMappings.get(messageValueItem.getKey()), Double.parseDouble(messageValueItem.getValue()));
                     } catch(NumberFormatException | ClassCastException e){
                         log.warn("NumberFormatException could not convert to double the value: " + messageValueItem.getValue());
                     }

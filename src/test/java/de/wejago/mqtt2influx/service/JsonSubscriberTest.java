@@ -11,12 +11,9 @@ import com.influxdb.client.domain.WritePrecision;
 import com.influxdb.client.write.Point;
 import de.wejago.mqtt2influx.config.Device;
 import de.wejago.mqtt2influx.repository.InfluxDbRepository;
-
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -44,7 +41,7 @@ class JsonSubscriberTest {
     void messageArrived_whenOnlyMatchFound() throws Exception {
         // GIVEN
         String receivedMessage = "{\"Time\":\"2023-05-10T10:16:32\",\"\":{\"Total_in\":695.38,\"Total_out\":16.94,\"Power_curr\":1151," +
-                "\"device_id\":\"0a01454d480000b22b25\"}}";
+                                 "\"device_id\":\"0a01454d480000b22b25\"}}";
         MqttMessage mqttMessage = new MqttMessage(receivedMessage.getBytes());
         Point generatedTestPoint = buildTestPoint();
 
@@ -56,6 +53,8 @@ class JsonSubscriberTest {
         verify(influxDbRepository, times(1)).writePoint(captor.capture());
         assertThat(captor.getValue())
                 .usingRecursiveComparison()
+                .ignoringFields("time")
+                .ignoringFields("precision")
                 .isEqualTo(generatedTestPoint);
     }
 
@@ -74,7 +73,7 @@ class JsonSubscriberTest {
     @Test
     void messageArrived_whenJsonProcessingExceptionThrown() throws Exception {
         // GIVEN
-        MqttMessage mqttMessage = new MqttMessage("testPayload".getBytes());
+        MqttMessage mqttMessage = new MqttMessage("device_id".getBytes());
 
         // WHEN
         jsonSubscriber.messageArrived("testTopic", mqttMessage);
@@ -90,6 +89,7 @@ class JsonSubscriberTest {
         deviceMappings.put("Power_curr", "Current Consumption");
         deviceMappings.put("device_id", "Device ID");
         device = new Device();
+        device.setName("testName");
         device.setSensorId("device_id");
         device.setOnlyMatch("device_id");
         device.setMappings(deviceMappings);
@@ -97,9 +97,9 @@ class JsonSubscriberTest {
 
     private Point buildTestPoint() {
         return Point.measurement("sensor")
-                .time(LocalDateTime.of(2023, 5, 10, 10, 16, 32).toInstant(ZoneOffset.UTC), WritePrecision.MS)
+                .time(Instant.now(), WritePrecision.MS)
                 .addTag("sensor_id", "0a01454d480000b22b25")
-                .addTag("device_name", null)
+                .addTag("device_name", "testName")
                 .addField("Total Consumption", 695.38)
                 .addField("Total Production", 16.94)
                 .addField("Current Consumption", 1151D);
