@@ -24,7 +24,7 @@ public class MqttClientConfig {
     @Bean
     public IMqttClient getMqttClient() {
         try (MemoryPersistence persistence = new MemoryPersistence()) {
-            String clientId =  "mqtt-2-influx-db-application-" + InetAddress.getLocalHost().getHostName();
+            String clientId = "mqtt-2-influx-db-application-" + InetAddress.getLocalHost().getHostName();
             log.info("mqtt IP: " + mqttProperties.getBrokerIp() + " user: " + mqttProperties.getUsername() + " client ID: " + clientId);
             return new MqttClient(buildBrokerUrl(), clientId, persistence);
         } catch (MqttException e) {
