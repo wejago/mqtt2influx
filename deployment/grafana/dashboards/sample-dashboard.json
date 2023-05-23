@@ -111,7 +111,7 @@
             "uid": "P951FEA4DE68E13C5"
           },
           "key": "Q-682c70ca-0bfa-4ddb-a838-e6349169f5bd-0",
-          "query": "from(bucket: \"hichi\")\r\n  |> range(start: -24h)\r\n  |> filter(fn: (r) =>\r\n    r._measurement == \"sensor\" and\r\n    r._field == \"currentConsumption(16_7_0)\"\r\n  )",
+          "query": "from(bucket: \"mqtt\")\r\n  |> range(start: -24h)\r\n  |> filter(fn: (r) =>\r\n    r._measurement == \"sensor\" and\r\n    r._field == \"Current Consumption\" and\r\n    r.sensor_id == \"090145425a01000c82dc\"\r\n  )",
           "refId": "A"
         }
       ],
@@ -183,8 +183,11 @@
           "showLegend": true
         },
         "orientation": "auto",
-        "showValue": "auto",
+        "showValue": "always",
         "stacking": "none",
+        "text": {
+          "valueSize": 10
+        },
         "tooltip": {
           "mode": "single",
           "sort": "none"
@@ -199,7 +202,7 @@
             "uid": "P951FEA4DE68E13C5"
           },
           "key": "Q-682c70ca-0bfa-4ddb-a838-e6349169f5bd-0",
-          "query": "import \"timezone\"\r\nimport \"date\"\r\n\r\noption location = timezone.location(name: \"Europe/Berlin\")\r\nts2 = date.sub(from: today(), d: 1d)\r\nte2 = date.sub(from: ts2, d: -24h)\r\n\r\nfrom(bucket: \"hichi\")\r\n  |> range(start: ts2, stop: te2)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"sensor\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"currentConsumption(16_7_0)\")\r\n  |> aggregateWindow(every: 1h, fn: mean)",
+          "query": "import \"timezone\"\r\nimport \"date\"\r\n\r\noption location = timezone.location(name: \"Europe/Berlin\")\r\nts2 = date.sub(from: today(), d: 1d)\r\nte2 = date.sub(from: ts2, d: -24h)\r\n\r\nfrom(bucket: \"mqtt\")\r\n  |> range(start: ts2, stop: te2)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"sensor\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"Current Consumption\")\r\n  |> filter(fn: (r) => r[\"sensor_id\"] == \"090145425a01000c82dc\")\r\n  |> aggregateWindow(every: 1h, fn: mean, timeSrc:\"_start\")",
           "refId": "A"
         }
       ],
@@ -250,7 +253,20 @@
           },
           "unit": "watt"
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Time"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "time: HH"
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
         "h": 8,
@@ -273,6 +289,9 @@
         "orientation": "auto",
         "showValue": "always",
         "stacking": "none",
+        "text": {
+          "valueSize": 10
+        },
         "tooltip": {
           "mode": "single",
           "sort": "none"
@@ -287,7 +306,7 @@
             "uid": "P951FEA4DE68E13C5"
           },
           "key": "Q-682c70ca-0bfa-4ddb-a838-e6349169f5bd-0",
-          "query": "from(bucket: \"hichi\")\r\n  |> range(start: -24h)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"sensor\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"currentConsumption(16_7_0)\")\r\n  |> aggregateWindow(every: 1h, fn: mean)",
+          "query": "from(bucket: \"mqtt\")\r\n  |> range(start: -24h)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"sensor\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"Current Consumption\")\r\n  |> filter(fn: (r) => r[\"sensor_id\"] == \"090145425a01000c82dc\")\r\n  |> aggregateWindow(every: 1h, fn: mean, timeSrc:\"_start\")",
           "refId": "A"
         }
       ],
@@ -308,6 +327,7 @@
           "custom": {
             "axisCenteredZero": false,
             "axisColorMode": "text",
+            "axisLabel": "",
             "axisPlacement": "auto",
             "fillOpacity": 80,
             "gradientMode": "none",
@@ -464,7 +484,9 @@
         "orientation": "auto",
         "showValue": "always",
         "stacking": "none",
-        "text": {},
+        "text": {
+          "valueSize": 10
+        },
         "tooltip": {
           "mode": "multi",
           "sort": "none"
@@ -480,12 +502,254 @@
             "type": "influxdb",
             "uid": "P951FEA4DE68E13C5"
           },
-          "query": "import \"date\"\r\nimport \"timezone\"\r\noption location = timezone.location(name: \"Europe/Berlin\")\r\n\r\nfrom(bucket: \"hichi\")\r\n  |> range(start: -1y)\r\n  |> filter(fn: (r) =>\r\n    r._measurement == \"sensor\"  and\r\n    r._field == \"currentConsumption(16_7_0)\"\r\n  )\r\n  |> map(fn: (r) => ({ r with hour: date.hour(t: r._time) }))\r\n  |> group(columns: [\"hour\"], mode:\"by\")\r\n  |> mean(column: \"_value\") \r\n  |> group()\r\n",
+          "query": "import \"date\"\r\nimport \"timezone\"\r\noption location = timezone.location(name: \"Europe/Berlin\")\r\n\r\nfrom(bucket: \"mqtt\")\r\n  |> range(start: -1y)\r\n  |> filter(fn: (r) =>\r\n    r._measurement == \"sensor\"  and\r\n    r._field == \"Current Consumption\" and\r\n    r.sensor_id == \"090145425a01000c82dc\"\r\n  )\r\n  |> map(fn: (r) => ({ r with hour: date.hour(t: r._time) }))\r\n  |> group(columns: [\"hour\"], mode:\"by\")\r\n  |> mean(column: \"_value\") \r\n  |> group()\r\n",
           "refId": "A"
         }
       ],
       "title": "Average Hourly Consumption - past 12 months",
       "transformations": [],
+      "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "P951FEA4DE68E13C5"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "watt"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Time"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "time: dddd"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 16
+      },
+      "id": 10,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.97,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "auto",
+        "showValue": "always",
+        "stacking": "none",
+        "text": {
+          "valueSize": 10
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        },
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "P951FEA4DE68E13C5"
+          },
+          "query": "import \"date\"\r\nimport \"timezone\"\r\noption location = timezone.location(name: \"Europe/Berlin\")\r\nts = date.sub(from: today(), d: 1w)\r\nte = today()\r\n\r\nfrom(bucket: \"mqtt\")\r\n|> range(start: ts, stop: te)\r\n|> filter(fn: (r) => r[\"_measurement\"] == \"sensor\")\r\n|> filter(fn: (r) => r[\"_field\"] == \"Current Consumption\")\r\n|> filter(fn: (r) => r[\"sensor_id\"] == \"090145425a01000c82dc\")\r\n|> aggregateWindow(every: 1h, fn: mean)\r\n|> aggregateWindow(every: 1d, fn: sum, timeSrc:\"_start\")",
+          "refId": "A"
+        }
+      ],
+      "title": "Daily consumption - past 7 days ",
+      "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "P951FEA4DE68E13C5"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "watt"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "_day"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "0": {
+                        "index": 0,
+                        "text": "Sunday"
+                      },
+                      "1": {
+                        "index": 1,
+                        "text": "Monday"
+                      },
+                      "2": {
+                        "index": 2,
+                        "text": "Tuesday"
+                      },
+                      "3": {
+                        "index": 3,
+                        "text": "Wednesday"
+                      },
+                      "4": {
+                        "index": 4,
+                        "text": "Thursday"
+                      },
+                      "5": {
+                        "index": 5,
+                        "text": "Friday"
+                      },
+                      "6": {
+                        "index": 6,
+                        "text": "Saturday"
+                      }
+                    },
+                    "type": "value"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 16
+      },
+      "id": 12,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.97,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "auto",
+        "showValue": "always",
+        "stacking": "none",
+        "text": {
+          "valueSize": 10
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        },
+        "xField": "_day",
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
+      },
+      "pluginVersion": "9.4.3",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "P951FEA4DE68E13C5"
+          },
+          "query": "import \"date\"\r\nfrom(bucket:\"mqtt\")\r\n|> range(start: -1y)\r\n|> filter(fn: (r) =>\r\nr._measurement == \"sensor\" and\r\nr._field == \"Current Consumption\" and\r\nr.sensor_id == \"090145425a01000c82dc\"\r\n)\r\n|> aggregateWindow(every: 1h, fn: mean)\r\n|> aggregateWindow(every: 1d, fn: sum, timeSrc:\"_start\")\r\n|> map(fn: (r) => ({r with _day: date.weekDay(t: r._time)}))\r\n|> group(columns:[\"_day\"], mode: \"by\")\r\n|> mean(column: \"_value\")\r\n|> group()",
+          "refId": "A"
+        }
+      ],
+      "title": "Weekday consumption - past 12 months",
       "type": "barchart"
     },
     {
@@ -535,12 +799,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Time"
+              "options": "_week"
             },
             "properties": [
               {
                 "id": "unit",
-                "value": "time: W"
+                "value": "none"
               }
             ]
           }
@@ -550,7 +814,7 @@
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 16
+        "y": 24
       },
       "hidetimeoverride": true,
       "id": 3,
@@ -568,11 +832,14 @@
         "orientation": "auto",
         "showValue": "always",
         "stacking": "none",
+        "text": {
+          "valueSize": 10
+        },
         "tooltip": {
           "mode": "single",
           "sort": "none"
         },
-        "xField": "Time",
+        "xField": "_week",
         "xTickLabelRotation": 0,
         "xTickLabelSpacing": 0
       },
@@ -582,7 +849,7 @@
             "type": "influxdb",
             "uid": "P951FEA4DE68E13C5"
           },
-          "query": "// v.windowPeriod is a variable referring to the current optimized window period (currently: $interval)\r\nimport \"timezone\"\r\noption location = timezone.location(name: \"Europe/Berlin\")\r\n\r\nfrom(bucket: \"hichi\")\r\n  |> range(start: - 12mo)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"sensor\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"currentConsumption(16_7_0)\")\r\n  |> aggregateWindow(every: 1h, fn: mean)\r\n  |> aggregateWindow(every: 1w, offset: -3d, fn: sum)\r\n  |> yield(name: \"some-name\")",
+          "query": "import \"timezone\"\r\nimport \"date\"\r\noption location = timezone.location(name: \"Europe/Berlin\")\r\nfrom(bucket: \"mqtt\")\r\n  |> range(start: - 12mo)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"sensor\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"Current Consumption\")\r\n  |> filter(fn: (r) => r[\"sensor_id\"] == \"090145425a01000c82dc\")\r\n  |> aggregateWindow(every: 1h, fn: mean)\r\n  |> map(fn: (r) => ({r with _week: date.week(t: r._time)}))\r\n  |> group(columns:[\"_week\"], mode: \"by\")\r\n  |> sum(column: \"_value\")\r\n  |> group()",
           "refId": "A"
         }
       ],
@@ -621,38 +888,78 @@
               "mode": "off"
             }
           },
-          "mappings": [],
+          "mappings": [
+            {
+              "options": {
+                "1": {
+                  "index": 0,
+                  "text": "January"
+                },
+                "2": {
+                  "index": 1,
+                  "text": "February"
+                },
+                "3": {
+                  "index": 2,
+                  "text": "March"
+                },
+                "4": {
+                  "index": 3,
+                  "text": "April"
+                },
+                "5": {
+                  "index": 4,
+                  "text": "May"
+                },
+                "6": {
+                  "index": 5,
+                  "text": "June"
+                },
+                "7": {
+                  "index": 6,
+                  "text": "July"
+                },
+                "8": {
+                  "index": 7,
+                  "text": "August"
+                },
+                "9": {
+                  "index": 8,
+                  "text": "September"
+                },
+                "10": {
+                  "index": 9,
+                  "text": "October"
+                },
+                "11": {
+                  "index": 10,
+                  "text": "November"
+                },
+                "12": {
+                  "index": 11,
+                  "text": "December"
+                }
+              },
+              "type": "value"
+            }
+          ],
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               }
             ]
           },
           "unit": "watt"
         },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Time"
-            },
-            "properties": [
-              {
-                "id": "unit",
-                "value": "time: MM.YY"
-              }
-            ]
-          }
-        ]
+        "overrides": []
       },
       "gridPos": {
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 24
+        "y": 32
       },
       "hideTimeOverride": false,
       "id": 7,
@@ -668,14 +975,15 @@
           "showLegend": true
         },
         "orientation": "auto",
-        "showValue": "auto",
+        "showValue": "always",
         "stacking": "none",
         "tooltip": {
           "mode": "single",
           "sort": "none"
         },
+        "xField": "_month",
         "xTickLabelRotation": 0,
-        "xTickLabelSpacing": -100
+        "xTickLabelSpacing": 0
       },
       "targets": [
         {
@@ -683,7 +991,7 @@
             "type": "influxdb",
             "uid": "P951FEA4DE68E13C5"
           },
-          "query": "// v.windowPeriod is a variable referring to the current optimized window period (currently: $interval)\r\nimport \"timezone\"\r\noption location = timezone.location(name: \"Europe/Berlin\")\r\n\r\nfrom(bucket: \"hichi\")\r\n  |> range(start: -12mo)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"sensor\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"currentConsumption(16_7_0)\")\r\n  |> aggregateWindow(every: 1h, fn: mean)\r\n  |> aggregateWindow(every: 1mo, fn: sum)",
+          "query": "import \"timezone\"\r\nimport \"date\"\r\noption location = timezone.location(name: \"Europe/Berlin\")\r\nfrom(bucket: \"mqtt\")\r\n  |> range(start: - 12mo)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"sensor\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"Current Consumption\")\r\n  |> filter(fn: (r) => r[\"sensor_id\"] == \"090145425a01000c82dc\")\r\n  |> aggregateWindow(every: 1h, fn: mean)\r\n  |> map(fn: (r) => ({r with _month: date.month(t: r._time)}))\r\n  |> group(columns:[\"_month\"], mode: \"by\")\r\n  |> sum(column: \"_value\")\r\n  |> group()",
           "refId": "A"
         }
       ],
@@ -691,7 +999,7 @@
       "type": "barchart"
     }
   ],
-  "refresh": "",
+  "refresh": false,
   "revision": 1,
   "schemaVersion": 38,
   "style": "dark",
@@ -700,12 +1008,12 @@
     "list": []
   },
   "time": {
-    "from": "now-24h",
-    "to": "now"
+    "from": "2023-05-23T11:32:47.191Z",
+    "to": "2023-05-23T12:12:47.125Z"
   },
   "timepicker": {},
-  "timezone": "utc",
-  "title": "power consumption",
+  "timezone": "Europe/Berlin",
+  "title": "power consumption - hichi",
   "uid": "Md5SfoxVk",
   "version": 1,
   "weekStart": ""
