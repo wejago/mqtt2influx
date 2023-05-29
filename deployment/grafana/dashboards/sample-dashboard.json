@@ -560,12 +560,46 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Time"
+              "options": "_day"
             },
             "properties": [
               {
-                "id": "unit",
-                "value": "time: dddd"
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "0": {
+                        "index": 0,
+                        "text": "Sunday"
+                      },
+                      "1": {
+                        "index": 1,
+                        "text": "Monday"
+                      },
+                      "2": {
+                        "index": 2,
+                        "text": "Tuesday"
+                      },
+                      "3": {
+                        "index": 3,
+                        "text": "Wednesday"
+                      },
+                      "4": {
+                        "index": 4,
+                        "text": "Thursday"
+                      },
+                      "5": {
+                        "index": 5,
+                        "text": "Friday"
+                      },
+                      "6": {
+                        "index": 6,
+                        "text": "Saturday"
+                      }
+                    },
+                    "type": "value"
+                  }
+                ]
               }
             ]
           }
@@ -599,6 +633,7 @@
           "mode": "single",
           "sort": "none"
         },
+        "xField": "_day",
         "xTickLabelRotation": 0,
         "xTickLabelSpacing": 0
       },
@@ -608,7 +643,7 @@
             "type": "influxdb",
             "uid": "P951FEA4DE68E13C5"
           },
-          "query": "import \"date\"\r\nimport \"timezone\"\r\noption location = timezone.location(name: \"Europe/Berlin\")\r\nts = date.sub(from: today(), d: 1w)\r\nte = today()\r\n\r\nfrom(bucket: \"mqtt\")\r\n|> range(start: ts, stop: te)\r\n|> filter(fn: (r) => r[\"_measurement\"] == \"sensor\")\r\n|> filter(fn: (r) => r[\"_field\"] == \"Current Consumption\")\r\n|> filter(fn: (r) => r[\"sensor_id\"] == \"090145425a01000c82dc\")\r\n|> aggregateWindow(every: 1h, fn: mean)\r\n|> aggregateWindow(every: 1d, fn: sum, timeSrc:\"_start\")",
+          "query": "import \"date\"\r\nimport \"timezone\"\r\noption location = timezone.location(name: \"Europe/Berlin\")\r\nts = date.sub(from: today(), d: 1w)\r\nte = today()\r\nfrom(bucket: \"mqtt\")\r\n|> range(start: ts, stop: te)\r\n|> filter(fn: (r) => r[\"_measurement\"] == \"sensor\")\r\n|> filter(fn: (r) => r[\"_field\"] == \"Current Consumption\")\r\n|> filter(fn: (r) => r[\"sensor_id\"] == \"090145425a01000c82dc\")\r\n|> aggregateWindow(every: 1h, fn: mean)\r\n|> map(fn: (r) => ({r with _day: date.weekDay(t: r._time)}))\r\n|> group(columns:[\"_day\"], mode: \"by\")\r\n|> sum(column: \"_value\")\r\n|> group()",
           "refId": "A"
         }
       ],
@@ -947,7 +982,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               }
             ]
           },
@@ -999,7 +1035,7 @@
       "type": "barchart"
     }
   ],
-  "refresh": false,
+  "refresh": "",
   "revision": 1,
   "schemaVersion": 38,
   "style": "dark",
@@ -1008,8 +1044,8 @@
     "list": []
   },
   "time": {
-    "from": "2023-05-23T11:32:47.191Z",
-    "to": "2023-05-23T12:12:47.125Z"
+    "from": "now-24h",
+    "to": "now"
   },
   "timepicker": {},
   "timezone": "Europe/Berlin",
