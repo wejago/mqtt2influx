@@ -2,7 +2,7 @@ package de.wejago.mqtt2influx.service;
 
 import de.wejago.mqtt2influx.config.Device;
 import de.wejago.mqtt2influx.config.DevicesConfig;
-import de.wejago.mqtt2influx.factory.JsonSubscriberFactory;
+import de.wejago.mqtt2influx.factory.SubscriberFactory;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +20,7 @@ public class MqttSubscriberService {
     private final IMqttClient mqttClient;
     private final MqttConnectOptions mqttConnectOptions;
     private final DevicesConfig devicesConfig;
-    private final JsonSubscriberFactory jsonSubscriberFactory;
+    private final SubscriberFactory subscriberFactory;
 
     @PostConstruct
     public void postConstruct() {
@@ -28,7 +28,7 @@ public class MqttSubscriberService {
             mqttClient.connect(mqttConnectOptions);
             for (Device device : devicesConfig.getDevices()) {
                 if (isDeviceValid(device)) {
-                    IMqttMessageListener subscriber = jsonSubscriberFactory.create(device);
+                    IMqttMessageListener subscriber = subscriberFactory.create(device);
                     mqttClient.subscribe(device.getTopic(), subscriber);
                     log.info("subscribed to topic: " + device.getTopic());
                 }

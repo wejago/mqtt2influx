@@ -19,7 +19,7 @@ class DevicesConfigIntegrationTest {
     void testDevicesConfigLoaded() {
         List<Device> devices = devicesConfig.getDevices();
         assertNotNull(devices);
-        assertEquals(2, devices.size());
+        assertEquals(3, devices.size());
 
         Device device1 = devices.get(0);
         assertEquals("hichi", device1.getName());
@@ -38,5 +38,13 @@ class DevicesConfigIntegrationTest {
         Map<String, String> mappings2 = device2.getMappings();
         assertEquals(4, mappings2.size());
         assertEquals("Total Consumption", mappings2.get("Total_in"));
+
+        Device device3 = devices.get(2);
+        assertEquals("solar", device3.getName());
+        assertEquals("raw", device3.getType());
+        assertEquals("solar/1111111111111/0/#", device3.getTopic());
+        Map<String, String> mappings3 = device3.getMappings();
+        assertEquals(11, mappings3.size());
+        assertEquals("Total Production", mappings3.get("yieldtotal"));
     }
 }
