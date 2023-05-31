@@ -12,7 +12,7 @@ import static org.mockito.Mockito.when;
 
 import de.wejago.mqtt2influx.config.Device;
 import de.wejago.mqtt2influx.config.DevicesConfig;
-import de.wejago.mqtt2influx.factory.JsonSubscriberFactory;
+import de.wejago.mqtt2influx.factory.SubscriberFactory;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
@@ -37,7 +37,7 @@ class MqttSubscriberServiceTest {
     @Mock
     private DevicesConfig devicesConfig;
     @Mock
-    private JsonSubscriberFactory jsonSubscriberFactory;
+    private SubscriberFactory subscriberFactory;
     @InjectMocks
     private MqttSubscriberService mqttSubscriberService;
 
@@ -53,8 +53,8 @@ class MqttSubscriberServiceTest {
 
         //THEN
         verify(mqttClient, times(1)).connect(mqttConnectOptions);
-        verify(mqttClient, times(1)).subscribe(device1.getTopic(), jsonSubscriberFactory.create(device1));
-        verify(mqttClient, times(1)).subscribe(device2.getTopic(), jsonSubscriberFactory.create(device2));
+        verify(mqttClient, times(1)).subscribe(device1.getTopic(), subscriberFactory.create(device1));
+        verify(mqttClient, times(1)).subscribe(device2.getTopic(), subscriberFactory.create(device2));
     }
 
     @Test

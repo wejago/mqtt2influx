@@ -24,3 +24,20 @@ devices:
       Total_in: Total Consumption
       Total_out: Total Production
       Power_curr: Current Consumption
+  - name: solar
+    type: raw
+    topic: solar/1111111111111/0/#
+    sensor_id: 'id'
+    only_match: ''
+    mappings:
+      yieldtotal: Total Production
+      yieldday: Produced today
+      power: Current power
+      powerdc: Direct Current Power
+      voltage: Voltage
+      current: Current
+      frequency: Frequency
+      powerfactor: Power Factor
+      efficiency: Efficiency
+      reactivepower: Reactive Power
+      temperature: Temperature
