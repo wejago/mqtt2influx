@@ -4,10 +4,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.influxdb.client.domain.WritePrecision;
-import com.influxdb.client.write.Point;
 import de.wejago.mqtt2influx.config.Device;
-import de.wejago.mqtt2influx.repository.InfluxDbRepository;
+import de.wejago.mqtt2influx.config.MqttDataPoint;
+import de.wejago.mqtt2influx.repository.KafkaRepository;
 import java.time.Instant;
 import java.util.Iterator;
 import java.util.Map;
@@ -24,7 +23,7 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 public class JsonSubscriber implements IMqttMessageListener {
     private static final Pattern NUMBER_PATTERN = Pattern.compile("-?\\d+(\\.\\d+)?");
     private final ObjectMapper objectMapper;
-    private final InfluxDbRepository influxDbRepository;
+    private final KafkaRepository kafkaRepository;
     private final Device device;
 
     @Override
@@ -35,8 +34,10 @@ public class JsonSubscriber implements IMqttMessageListener {
             if (StringUtils.isNotBlank(device.getOnlyMatch()) && receivedMessage.contains(device.getOnlyMatch())) {
                 JsonNode messageNode = objectMapper.readTree(receivedMessage);
                 Map<String, Object> deviceToPointProperties = readDeviceValuesFromMqttMessage(messageNode);
-                Point point = generateMeasurementPoint(deviceToPointProperties, device);
-                influxDbRepository.writePoint(point);
+                MqttDataPoint mqttDataPoint = generateMqttDataPoint(deviceToPointProperties, device);
+                System.out.println("mqttDataPoint size = " + mqttDataPoint.getFields().size());
+                kafkaRepository.writePoint(mqttDataPoint);
+                System.out.println(device.getName());
             }
         } catch (JsonProcessingException e) {
             log.error("objectMapper JsonProcessingException" + e);
@@ -83,15 +84,16 @@ public class JsonSubscriber implements IMqttMessageListener {
         }
     }
 
-    private Point generateMeasurementPoint(Map<String, Object> deviceToPointProperties, Device device) {
+    private MqttDataPoint generateMqttDataPoint(Map<String, Object> deviceToPointProperties, Device device) {
+        MqttDataPoint mqttDataPoint = new MqttDataPoint();
         String sensorId = deviceToPointProperties.get(device.getMappings().get(device.getSensorId())).toString();
         //remove the sensor_id because it is String and cannot be added to the point as a field
         deviceToPointProperties.remove(device.getMappings().get(device.getSensorId()));
-        return Point
-            .measurement("sensor")
-            .addTag("device_name", device.getName())
-            .addTag("sensor_id", sensorId)
-            .addFields(deviceToPointProperties)
-            .time(Instant.now(), WritePrecision.MS);
+        mqttDataPoint.setDevice_name(device.getName());
+        mqttDataPoint.setSensor_id(sensorId);
+        mqttDataPoint.setFields(deviceToPointProperties);
+        mqttDataPoint.setTime(Instant.now());
+
+        return mqttDataPoint;
     }
 }

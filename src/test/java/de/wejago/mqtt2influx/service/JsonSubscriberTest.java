@@ -10,7 +10,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.influxdb.client.domain.WritePrecision;
 import com.influxdb.client.write.Point;
 import de.wejago.mqtt2influx.config.Device;
+import de.wejago.mqtt2influx.config.MqttDataPoint;
 import de.wejago.mqtt2influx.repository.InfluxDbRepository;
+import de.wejago.mqtt2influx.repository.KafkaRepository;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,7 +28,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class JsonSubscriberTest {
     private ObjectMapper objectMapper = new ObjectMapper();
     @Mock
-    private InfluxDbRepository influxDbRepository;
+    private KafkaRepository kafkaRepository;
 
     private Device device;
     private JsonSubscriber jsonSubscriber;
@@ -34,7 +36,7 @@ class JsonSubscriberTest {
     @BeforeEach
     public void setUp() {
         buildTestDevice();
-        jsonSubscriber = new JsonSubscriber(objectMapper, influxDbRepository, device);
+        jsonSubscriber = new JsonSubscriber(objectMapper, kafkaRepository, device);
     }
 
     @Test
@@ -43,14 +45,14 @@ class JsonSubscriberTest {
         String receivedMessage = "{\"Time\":\"2023-05-10T10:16:32\",\"\":{\"Total_in\":695.38,\"Total_out\":16.94,\"Power_curr\":1151," +
                                  "\"device_id\":\"0a01454d480000b22b25\"}}";
         MqttMessage mqttMessage = new MqttMessage(receivedMessage.getBytes());
-        Point generatedTestPoint = buildTestPoint();
+        MqttDataPoint generatedTestPoint = buildTestMqttPoint();
 
         // WHEN
         jsonSubscriber.messageArrived("testTopic", mqttMessage);
 
         // THEN
-        ArgumentCaptor<Point> captor = ArgumentCaptor.forClass(Point.class);
-        verify(influxDbRepository, times(1)).writePoint(captor.capture());
+        ArgumentCaptor<MqttDataPoint> captor = ArgumentCaptor.forClass(MqttDataPoint.class);
+        verify(kafkaRepository, times(1)).writePoint(captor.capture());
         assertThat(captor.getValue())
                 .usingRecursiveComparison()
                 .ignoringFields("time")
@@ -67,7 +69,7 @@ class JsonSubscriberTest {
         jsonSubscriber.messageArrived("testTopic", mqttMessage);
 
         // THEN
-        verify(influxDbRepository, never()).writePoint(any());
+        verify(kafkaRepository, never()).writePoint(any());
     }
 
     @Test
@@ -79,7 +81,7 @@ class JsonSubscriberTest {
         jsonSubscriber.messageArrived("testTopic", mqttMessage);
 
         // THEN
-        verify(influxDbRepository, never()).writePoint(any());
+        verify(kafkaRepository, never()).writePoint(any());
     }
 
     private void buildTestDevice() {
@@ -95,13 +97,16 @@ class JsonSubscriberTest {
         device.setMappings(deviceMappings);
     }
 
-    private Point buildTestPoint() {
-        return Point.measurement("sensor")
-                .time(Instant.now(), WritePrecision.MS)
-                .addTag("sensor_id", "0a01454d480000b22b25")
-                .addTag("device_name", "testName")
-                .addField("Total Consumption", 695.38)
-                .addField("Total Production", 16.94)
-                .addField("Current Consumption", 1151D);
+    private MqttDataPoint buildTestMqttPoint() {
+        MqttDataPoint testMqttPoint = new MqttDataPoint();
+        testMqttPoint.setSensor_id("0a01454d480000b22b25");
+        testMqttPoint.setDevice_name("testName");
+        testMqttPoint.setTime(Instant.now());
+        Map<String, Object> fields = new HashMap<>();
+        fields.put("Total Consumption", 695.38);
+        fields.put("Total Production", 16.94);
+        fields.put("Current Consumption", 1151D);
+        testMqttPoint.setFields(fields);
+        return testMqttPoint;
     }
 }

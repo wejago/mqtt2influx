@@ -23,7 +23,7 @@ services:
     networks:
       - mqtt2influx-network
     depends_on:
-      - influxdb
+      - kafka
     environment:
       - INFLUX_URL=http://influxdb:8086
       - INFLUX_TOKEN=${INFLUX_TOKEN}
@@ -37,24 +37,33 @@ services:
       - "./mqtt2influx-configuration.yaml:/mqtt2influx-configuration.yaml"
     restart: unless-stopped
 
-  influxdb:
-    container_name: influxdb
-    image: influxdb:latest
-    volumes:
-      - "./influxdb:/var/lib/influxdb2"
-    ports:
-      - "8086:8086"
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
     environment:
-      - DOCKER_INFLUXDB_INIT_MODE=setup
-      - DOCKER_INFLUXDB_INIT_ORG=wejago
-      - DOCKER_INFLUXDB_INIT_BUCKET=hichi
-      - DOCKER_INFLUXDB_INIT_USERNAME=${DOCKER_INFLUXDB_INIT_USERNAME}
-      - DOCKER_INFLUXDB_INIT_PASSWORD=${DOCKER_INFLUXDB_INIT_PASSWORD}
-      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=${INFLUX_TOKEN}
-    env_file:
-      - .env
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - 22181:2181
     networks:
-      -   mqtt2influx-network
+      - mqtt2kafka-network
+    restart: unless-stopped
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    depends_on:
+      - zookeeper
+    ports:
+      - 29092:29092
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_CREATE_TOPICS: "mqtt"
+    networks:
+      - mqtt2kafka-network
     restart: unless-stopped
 
   grafana:
