@@ -24,6 +24,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
+  "id": 1,
   "links": [],
   "liveNow": false,
   "panels": [
@@ -111,7 +112,7 @@
             "uid": "P951FEA4DE68E13C5"
           },
           "key": "Q-682c70ca-0bfa-4ddb-a838-e6349169f5bd-0",
-          "query": "from(bucket: \"mqtt\")\r\n  |> range(start: -24h)\r\n  |> filter(fn: (r) =>\r\n    r._measurement == \"sensor\" and\r\n    r._field == \"Current Consumption\" and\r\n    r.sensor_id == \"090145425a01000c82dc\"\r\n  )",
+          "query": "from(bucket: \"mqtt\")\r\n  |> range(start: -24h)\r\n  |> filter(fn: (r) =>\r\n    r._measurement == \"sensor\" and\r\n    r._field == \"Current Consumption\" and\r\n    r.device_name == \"${device_name}\"\r\n  )",
           "refId": "A"
         }
       ],
@@ -159,7 +160,7 @@
               }
             ]
           },
-          "unit": "watt"
+          "unit": "kwatt"
         },
         "overrides": []
       },
@@ -192,6 +193,7 @@
           "mode": "single",
           "sort": "none"
         },
+        "xField": "Time",
         "xTickLabelRotation": 0,
         "xTickLabelSpacing": 0
       },
@@ -202,7 +204,7 @@
             "uid": "P951FEA4DE68E13C5"
           },
           "key": "Q-682c70ca-0bfa-4ddb-a838-e6349169f5bd-0",
-          "query": "import \"timezone\"\r\nimport \"date\"\r\n\r\noption location = timezone.location(name: \"Europe/Berlin\")\r\nts2 = date.sub(from: today(), d: 1d)\r\nte2 = date.sub(from: ts2, d: -24h)\r\n\r\nfrom(bucket: \"mqtt\")\r\n  |> range(start: ts2, stop: te2)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"sensor\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"Current Consumption\")\r\n  |> filter(fn: (r) => r[\"sensor_id\"] == \"090145425a01000c82dc\")\r\n  |> aggregateWindow(every: 1h, fn: mean, timeSrc:\"_start\")",
+          "query": "import \"timezone\"\r\nimport \"date\"\r\n\r\noption location = timezone.location(name: \"Europe/Berlin\")\r\nts2 = date.sub(from: today(), d: 1d)\r\nte2 = date.sub(from: ts2, d: -24h)\r\n\r\nfrom(bucket: \"mqtt\")\r\n  |> range(start: ts2, stop: te2)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"sensor\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"Total Consumption\")\r\n  |> filter(fn: (r) => r[\"device_name\"] == \"${device_name}\")\r\n  |> aggregateWindow(every: 1h, fn: spread, timeSrc:\"_start\")",
           "refId": "A"
         }
       ],
@@ -251,7 +253,7 @@
               }
             ]
           },
-          "unit": "watt"
+          "unit": "kwatt"
         },
         "overrides": [
           {
@@ -296,6 +298,7 @@
           "mode": "single",
           "sort": "none"
         },
+        "xField": "Time",
         "xTickLabelRotation": 0,
         "xTickLabelSpacing": 0
       },
@@ -306,7 +309,7 @@
             "uid": "P951FEA4DE68E13C5"
           },
           "key": "Q-682c70ca-0bfa-4ddb-a838-e6349169f5bd-0",
-          "query": "from(bucket: \"mqtt\")\r\n  |> range(start: -24h)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"sensor\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"Current Consumption\")\r\n  |> filter(fn: (r) => r[\"sensor_id\"] == \"090145425a01000c82dc\")\r\n  |> aggregateWindow(every: 1h, fn: mean, timeSrc:\"_start\")",
+          "query": "from(bucket: \"mqtt\")\r\n  |> range(start: -24h)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"sensor\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"Total Consumption\")\r\n  |> filter(fn: (r) => r[\"device_name\"] == \"${device_name}\")\r\n  |> aggregateWindow(every: 1h, fn: spread, timeSrc:\"_start\")",
           "refId": "A"
         }
       ],
@@ -456,7 +459,7 @@
               }
             ]
           },
-          "unit": "watt"
+          "unit": "kwatt"
         },
         "overrides": []
       },
@@ -502,7 +505,7 @@
             "type": "influxdb",
             "uid": "P951FEA4DE68E13C5"
           },
-          "query": "import \"date\"\r\nimport \"timezone\"\r\noption location = timezone.location(name: \"Europe/Berlin\")\r\n\r\nfrom(bucket: \"mqtt\")\r\n  |> range(start: -1y)\r\n  |> filter(fn: (r) =>\r\n    r._measurement == \"sensor\"  and\r\n    r._field == \"Current Consumption\" and\r\n    r.sensor_id == \"090145425a01000c82dc\"\r\n  )\r\n  |> map(fn: (r) => ({ r with hour: date.hour(t: r._time) }))\r\n  |> group(columns: [\"hour\"], mode:\"by\")\r\n  |> mean(column: \"_value\") \r\n  |> group()\r\n",
+          "query": "import \"date\"\r\nimport \"timezone\"\r\n\r\noption location = timezone.location(name: \"Europe/Berlin\")\r\n\r\nfrom(bucket: \"mqtt\")\r\n  |> range(start: -1y)\r\n  |> filter(fn: (r) =>\r\n    r.device_name == \"${device_name}\" and\r\n    r._measurement == \"sensor\" and\r\n    r._field == \"Total Consumption\"\r\n  )\r\n|> aggregateWindow(every: 1h, fn: spread, timeSrc:\"_start\")\r\n|> map(fn: (r) => ({r with hour: date.hour(t: r._time)}))\r\n|> group(columns:[\"hour\"], mode: \"by\")\r\n|> mean(column: \"_value\")\r\n|> group()",
           "refId": "A"
         }
       ],
@@ -554,52 +557,18 @@
               }
             ]
           },
-          "unit": "watt"
+          "unit": "kwatt"
         },
         "overrides": [
           {
             "matcher": {
               "id": "byName",
-              "options": "_day"
+              "options": "Time"
             },
             "properties": [
               {
-                "id": "mappings",
-                "value": [
-                  {
-                    "options": {
-                      "0": {
-                        "index": 0,
-                        "text": "Sunday"
-                      },
-                      "1": {
-                        "index": 1,
-                        "text": "Monday"
-                      },
-                      "2": {
-                        "index": 2,
-                        "text": "Tuesday"
-                      },
-                      "3": {
-                        "index": 3,
-                        "text": "Wednesday"
-                      },
-                      "4": {
-                        "index": 4,
-                        "text": "Thursday"
-                      },
-                      "5": {
-                        "index": 5,
-                        "text": "Friday"
-                      },
-                      "6": {
-                        "index": 6,
-                        "text": "Saturday"
-                      }
-                    },
-                    "type": "value"
-                  }
-                ]
+                "id": "unit",
+                "value": "time: dddd"
               }
             ]
           }
@@ -624,7 +593,7 @@
           "showLegend": true
         },
         "orientation": "auto",
-        "showValue": "always",
+        "showValue": "auto",
         "stacking": "none",
         "text": {
           "valueSize": 10
@@ -633,7 +602,7 @@
           "mode": "single",
           "sort": "none"
         },
-        "xField": "_day",
+        "xField": "Time",
         "xTickLabelRotation": 0,
         "xTickLabelSpacing": 0
       },
@@ -643,7 +612,7 @@
             "type": "influxdb",
             "uid": "P951FEA4DE68E13C5"
           },
-          "query": "import \"date\"\r\nimport \"timezone\"\r\noption location = timezone.location(name: \"Europe/Berlin\")\r\nts = date.sub(from: today(), d: 1w)\r\nte = today()\r\nfrom(bucket: \"mqtt\")\r\n|> range(start: ts, stop: te)\r\n|> filter(fn: (r) => r[\"_measurement\"] == \"sensor\")\r\n|> filter(fn: (r) => r[\"_field\"] == \"Current Consumption\")\r\n|> filter(fn: (r) => r[\"sensor_id\"] == \"090145425a01000c82dc\")\r\n|> aggregateWindow(every: 1h, fn: mean)\r\n|> map(fn: (r) => ({r with _day: date.weekDay(t: r._time)}))\r\n|> group(columns:[\"_day\"], mode: \"by\")\r\n|> sum(column: \"_value\")\r\n|> group()",
+          "query": "import \"date\"\r\nimport \"timezone\"\r\noption location = timezone.location(name: \"Europe/Berlin\")\r\nts = date.sub(from: today(), d: 1w)\r\nte = today()\r\nfrom(bucket: \"mqtt\")\r\n|> range(start: ts, stop: te)\r\n|> filter(fn: (r) => r[\"_measurement\"] == \"sensor\")\r\n|> filter(fn: (r) => r[\"_field\"] == \"Total Consumption\")\r\n|> filter(fn: (r) => r[\"device_name\"] == \"${device_name}\")\r\n|> aggregateWindow(every: 1d, fn: spread, timeSrc:\"_start\")",
           "refId": "A"
         }
       ],
@@ -690,7 +659,7 @@
               }
             ]
           },
-          "unit": "watt"
+          "unit": "kwatt"
         },
         "overrides": [
           {
@@ -780,7 +749,7 @@
             "type": "influxdb",
             "uid": "P951FEA4DE68E13C5"
           },
-          "query": "import \"date\"\r\nfrom(bucket:\"mqtt\")\r\n|> range(start: -1y)\r\n|> filter(fn: (r) =>\r\nr._measurement == \"sensor\" and\r\nr._field == \"Current Consumption\" and\r\nr.sensor_id == \"090145425a01000c82dc\"\r\n)\r\n|> aggregateWindow(every: 1h, fn: mean)\r\n|> aggregateWindow(every: 1d, fn: sum, timeSrc:\"_start\")\r\n|> map(fn: (r) => ({r with _day: date.weekDay(t: r._time)}))\r\n|> group(columns:[\"_day\"], mode: \"by\")\r\n|> mean(column: \"_value\")\r\n|> group()",
+          "query": "import \"date\"\r\nfrom(bucket:\"mqtt\")\r\n|> range(start: -1y)\r\n|> filter(fn: (r) =>\r\nr._measurement == \"sensor\" and\r\nr._field == \"Total Consumption\" and\r\nr.device_name == \"${device_name}\"\r\n)\r\n|> aggregateWindow(every: 1d, fn: spread, timeSrc:\"_start\")\r\n|> map(fn: (r) => ({r with _day: date.weekDay(t: r._time)}))\r\n|> group(columns:[\"_day\"], mode: \"by\")\r\n|> mean(column: \"_value\")\r\n|> group()",
           "refId": "A"
         }
       ],
@@ -796,7 +765,7 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "palette-classic"
+            "mode": "thresholds"
           },
           "custom": {
             "axisCenteredZero": false,
@@ -828,7 +797,7 @@
               }
             ]
           },
-          "unit": "watt"
+          "unit": "kwatt"
         },
         "overrides": [
           {
@@ -878,13 +847,14 @@
         "xTickLabelRotation": 0,
         "xTickLabelSpacing": 0
       },
+      "pluginVersion": "9.4.3",
       "targets": [
         {
           "datasource": {
             "type": "influxdb",
             "uid": "P951FEA4DE68E13C5"
           },
-          "query": "import \"timezone\"\r\nimport \"date\"\r\noption location = timezone.location(name: \"Europe/Berlin\")\r\nfrom(bucket: \"mqtt\")\r\n  |> range(start: - 12mo)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"sensor\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"Current Consumption\")\r\n  |> filter(fn: (r) => r[\"sensor_id\"] == \"090145425a01000c82dc\")\r\n  |> aggregateWindow(every: 1h, fn: mean)\r\n  |> map(fn: (r) => ({r with _week: date.week(t: r._time)}))\r\n  |> group(columns:[\"_week\"], mode: \"by\")\r\n  |> sum(column: \"_value\")\r\n  |> group()",
+          "query": "import \"timezone\"\r\nimport \"date\"\r\noption location = timezone.location(name: \"Europe/Berlin\")\r\nfrom(bucket: \"mqtt\")\r\n  |> range(start: -3w) // change to your needs\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"sensor\" and r[\"_field\"] == \"Total Consumption\" and r[\"device_name\"] == \"${device_name}\")\r\n  |> map(fn: (r) => ({r with _week: date.week(t: r._time)}))\r\n  |> group(columns:[\"_week\"], mode: \"by\")\r\n  |> spread()\r\n  |> group()",
           "refId": "A"
         }
       ],
@@ -982,12 +952,11 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               }
             ]
           },
-          "unit": "watt"
+          "unit": "kwatt"
         },
         "overrides": []
       },
@@ -1013,11 +982,14 @@
         "orientation": "auto",
         "showValue": "always",
         "stacking": "none",
+        "text": {
+          "valueSize": 10
+        },
         "tooltip": {
           "mode": "single",
           "sort": "none"
         },
-        "xField": "_month",
+        "xField": "Time",
         "xTickLabelRotation": 0,
         "xTickLabelSpacing": 0
       },
@@ -1027,7 +999,7 @@
             "type": "influxdb",
             "uid": "P951FEA4DE68E13C5"
           },
-          "query": "import \"timezone\"\r\nimport \"date\"\r\noption location = timezone.location(name: \"Europe/Berlin\")\r\nfrom(bucket: \"mqtt\")\r\n  |> range(start: - 12mo)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"sensor\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"Current Consumption\")\r\n  |> filter(fn: (r) => r[\"sensor_id\"] == \"090145425a01000c82dc\")\r\n  |> aggregateWindow(every: 1h, fn: mean)\r\n  |> map(fn: (r) => ({r with _month: date.month(t: r._time)}))\r\n  |> group(columns:[\"_month\"], mode: \"by\")\r\n  |> sum(column: \"_value\")\r\n  |> group()",
+          "query": "import \"timezone\"\r\nimport \"date\"\r\noption location = timezone.location(name: \"Europe/Berlin\")\r\nfrom(bucket: \"mqtt\")\r\n  |> range(start: - 12mo)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"sensor\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"Total Consumption\")\r\n  |> filter(fn: (r) => r[\"device_name\"] == \"${device_name}\")\r\n  |> aggregateWindow(every: 1mo, fn: spread, timeSrc:\"_start\")",
           "refId": "A"
         }
       ],
@@ -1041,7 +1013,35 @@
   "style": "dark",
   "tags": [],
   "templating": {
-    "list": []
+    "list": [
+      {
+        "current": {
+          "selected": true,
+          "text": "hichi",
+          "value": "hichi"
+        },
+        "hide": 0,
+        "includeAll": false,
+        "multi": false,
+        "name": "device_name",
+        "options": [
+          {
+            "selected": true,
+            "text": "hichi",
+            "value": "hichi"
+          },
+          {
+            "selected": false,
+            "text": "tele (Other consumption monitor)",
+            "value": "tele (Other consumption monitor)"
+          }
+        ],
+        "query": "hichi, tele (Other consumption monitor)",
+        "queryValue": "",
+        "skipUrlSync": false,
+        "type": "custom"
+      }
+    ]
   },
   "time": {
     "from": "now-24h",
@@ -1049,7 +1049,7 @@
   },
   "timepicker": {},
   "timezone": "Europe/Berlin",
-  "title": "power consumption - hichi",
+  "title": "power consumption",
   "uid": "Md5SfoxVk",
   "version": 1,
   "weekStart": ""
