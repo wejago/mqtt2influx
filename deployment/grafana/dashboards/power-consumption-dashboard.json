@@ -24,7 +24,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 1,
+  "id": 4,
   "links": [],
   "liveNow": false,
   "panels": [
@@ -854,7 +854,7 @@
             "type": "influxdb",
             "uid": "P951FEA4DE68E13C5"
           },
-          "query": "import \"timezone\"\r\nimport \"date\"\r\noption location = timezone.location(name: \"Europe/Berlin\")\r\nfrom(bucket: \"mqtt\")\r\n  |> range(start: -3w) // change to your needs\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"sensor\" and r[\"_field\"] == \"Total Consumption\" and r[\"device_name\"] == \"${device_name}\")\r\n  |> map(fn: (r) => ({r with _week: date.week(t: r._time)}))\r\n  |> group(columns:[\"_week\"], mode: \"by\")\r\n  |> spread()\r\n  |> group()",
+          "query": "import \"timezone\"\r\nimport \"date\"\r\noption location = timezone.location(name: \"Europe/Berlin\")\r\nfrom(bucket: \"mqtt\")\r\n  |> range(start: -12mo)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"sensor\" and r[\"_field\"] == \"Total Consumption\" and r[\"sensor_id\"] == \"090145425a01000c82dc\")\r\n  |> aggregateWindow(every: 1w, fn: spread, timeSrc:\"_start\", offset: -3d)\r\n  |> map(fn: (r) => ({r with _week: date.week(t: r._time)}))\r\n  |> group(columns:[\"_week\"], mode: \"by\")\r\n  |> group()",
           "refId": "A"
         }
       ],
@@ -952,7 +952,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               }
             ]
           },
