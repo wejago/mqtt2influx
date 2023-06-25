@@ -31,6 +31,7 @@ services:
       - "./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards"
       - "./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources"
       - "./grafana/dashboards:/var/lib/grafana/dashboards"
+      - "./grafana/provisioning/alerting:/etc/grafana/provisioning/alerting"
     environment:
       - DOCKER_INFLUXDB_INIT_ORG=wejago
       - DOCKER_INFLUXDB_INIT_BUCKET=hichi

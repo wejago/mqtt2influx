@@ -1,0 +1,11 @@
+# config file version
+apiVersion: 1
+
+# List of notification policies
+policies:
+  # <int> organization ID, default = 1
+  - orgId: 1
+    # <string> name of the contact point that should be used for this route
+    receiver: alert_channel
+    group_by: ['...']
+

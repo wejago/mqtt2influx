@@ -1,0 +1,31 @@
+# config file version
+apiVersion: 1
+
+# List of contact points to import or update
+contactPoints:
+  # <int> organization ID, default = 1
+  - orgId: 1
+    # <string, required> name of the contact point
+    name: alert_channel
+    receivers:
+      # <string, required> unique identifier for the receiver
+      - uid: first_uid
+        # <string, required> type of the receiver
+        type: discord
+        settings:
+          # <string, required>
+          recipient: iot-project
+          # <string, required>
+          token: xxx
+          # <string>
+          username: grafana_bot
+          # <string>
+          mentionChannel: here
+          # <string> Optionally provide a Discord incoming webhook URL for sending messages, in this case the token isn't necessary
+          url: https://discord.com/api/webhooks/1103989400452485170/cdDOgYv-9uW3CfldmrdhZ7KWDmsJJV3DR4nPFYinf8c1Kf2fLs6sTtNZNp_PKV8bByRQ
+
+          # <string>
+          title: |
+            {{ template "discord.default.title" . }}
+          message: |
+            @here
