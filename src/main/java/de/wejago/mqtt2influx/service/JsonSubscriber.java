@@ -8,16 +8,17 @@ import com.influxdb.client.domain.WritePrecision;
 import com.influxdb.client.write.Point;
 import de.wejago.mqtt2influx.config.Device;
 import de.wejago.mqtt2influx.repository.InfluxDbRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.eclipse.paho.client.mqttv3.IMqttMessageListener;
+import org.eclipse.paho.client.mqttv3.MqttMessage;
+
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.regex.Pattern;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections.map.HashedMap;
-import org.apache.commons.lang.StringUtils;
-import org.eclipse.paho.client.mqttv3.IMqttMessageListener;
-import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -49,7 +50,7 @@ public class JsonSubscriber implements IMqttMessageListener {
     }
 
     private Map<String, Object> convertFromStringToMap(Map<String, String> deviceMappings, JsonNode messageNode) {
-        Map<String, Object> deviceToPointProperties = new HashedMap();
+        Map<String, Object> deviceToPointProperties = new HashMap<>();
         for (Iterator<Map.Entry<String, JsonNode>> it = messageNode.fields(); it.hasNext(); ) {
             Map.Entry<String, JsonNode> entry = it.next();
             if (entry.getValue().isObject()) {

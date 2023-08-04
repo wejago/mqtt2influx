@@ -1,9 +1,5 @@
 package de.wejago.mqtt2influx.factory;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.instanceOf;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import de.wejago.mqtt2influx.config.Device;
 import de.wejago.mqtt2influx.service.JsonSubscriber;
 import de.wejago.mqtt2influx.service.RawSubscriber;
@@ -12,6 +8,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.instanceOf;
 
 
 @ExtendWith(MockitoExtension.class)

@@ -12,7 +12,6 @@ services:
       - "./users.conf:/mosquitto/config/users.conf"
       - "./mosquitto/data:/mosquitto/data"
       - "./mosquitto/log:/mosquitto/log"
-      - "./mqtt2influx-configuration.yaml:/mqtt2influx-configuration.yaml"
     restart: unless-stopped
 
   mqtt2influx:

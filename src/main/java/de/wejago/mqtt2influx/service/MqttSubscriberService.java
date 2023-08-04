@@ -6,7 +6,7 @@ import de.wejago.mqtt2influx.factory.SubscriberFactory;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.paho.client.mqttv3.IMqttClient;
 import org.eclipse.paho.client.mqttv3.IMqttMessageListener;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
@@ -26,6 +26,10 @@ public class MqttSubscriberService {
     public void postConstruct() {
         try {
             mqttClient.connect(mqttConnectOptions);
+            if(devicesConfig.getDevices() == null) {
+                log.error("No devices in mqtt2influx-configuration.yaml");
+                return;
+            }
             for (Device device : devicesConfig.getDevices()) {
                 if (isDeviceValid(device)) {
                     IMqttMessageListener subscriber = subscriberFactory.create(device);
@@ -45,12 +49,16 @@ public class MqttSubscriberService {
         } else if(StringUtils.isBlank(device.getTopic())) {
             log.warn("Could NOT subscribe to device! The device topic is blank for device: " + device + " Topic: " + device.getTopic());
             return false;
-        } else if(device.getMappings().size() == 0) {
+        } else if(device.getMappings().isEmpty()) {
             log.warn("Could NOT subscribe to device! The deviceMapping is empty for device: "+ device);
             return false;
         } else if(StringUtils.isBlank(device.getSensorId())) {
-            log.warn("Could NOT subscribe to device! The sendorId is blank for device: " + device + " SensorId: " + device.getSensorId());
+            log.warn("Could NOT subscribe to device! The sensorId is blank for device: " + device + " SensorId: " + device.getSensorId());
             return false;
+        }
+
+        if(device.getTopic().contains("ThisShouldBeChanged")) {
+            log.warn("Service is currently using the packaged default configuration, you should adapt it to your needs!");
         }
 
         return true;
