@@ -47,6 +47,8 @@ CURRENT_DATE=$(date +'%Y-%m-%d')
 IFS=' ' read -r -a CONTAINER <<< "$INFLUX_LINE"
 
 # shellcheck disable=SC2128
+docker exec -it "$CONTAINER" rm -rf $CURRENT_DATE
+# shellcheck disable=SC2128
 docker exec -it "$CONTAINER" influx backup $CURRENT_DATE -t $INFLUX_TOKEN
 # shellcheck disable=SC2128
 docker cp $CONTAINER:$CURRENT_DATE $b/$CURRENT_DATE
