@@ -1,8 +1,10 @@
 package de.wejago.mqtt2influx.service;
 
-import de.wejago.mqtt2influx.config.Device;
-import de.wejago.mqtt2influx.config.DevicesConfig;
-import de.wejago.mqtt2influx.factory.SubscriberFactory;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.eclipse.paho.client.mqttv3.IMqttClient;
 import org.eclipse.paho.client.mqttv3.IMqttMessageListener;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
@@ -12,14 +14,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
 import org.springframework.boot.test.system.CapturedOutput;
 import org.springframework.boot.test.system.OutputCaptureExtension;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
+import de.wejago.mqtt2influx.config.Device;
+import de.wejago.mqtt2influx.config.DevicesConfig;
+import de.wejago.mqtt2influx.factory.SubscriberFactory;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
