@@ -5,6 +5,7 @@ target/
 deployment/.env
 deployment/mosquitto/
 deployment/influxdb/
+*~
 
 ### STS ###
 .apt_generated

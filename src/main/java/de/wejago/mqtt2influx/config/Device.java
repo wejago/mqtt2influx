@@ -1,8 +1,9 @@
 package de.wejago.mqtt2influx.config;
 
-import java.util.Map;
 import lombok.Data;
 import org.springframework.stereotype.Component;
+
+import java.util.Map;
 
 @Component
 @Data

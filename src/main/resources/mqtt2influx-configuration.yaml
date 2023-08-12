@@ -26,7 +26,7 @@ devices:
       Power_curr: Current Consumption
   - name: solar
     type: raw
-    topic: solar/1111111111111/0/#
+    topic: solar/111ThisShouldBeChanged111/0/#
     sensor_id: 'id'
     only_match: ''
     mappings:

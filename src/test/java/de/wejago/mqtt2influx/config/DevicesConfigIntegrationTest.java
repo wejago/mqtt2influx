@@ -1,13 +1,14 @@
 package de.wejago.mqtt2influx.config;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-
-import java.util.List;
-import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest
 class DevicesConfigIntegrationTest {
@@ -42,7 +43,7 @@ class DevicesConfigIntegrationTest {
         Device device3 = devices.get(2);
         assertEquals("solar", device3.getName());
         assertEquals("raw", device3.getType());
-        assertEquals("solar/1111111111111/0/#", device3.getTopic());
+        assertEquals("solar/111ThisShouldBeChanged111/0/#", device3.getTopic());
         Map<String, String> mappings3 = device3.getMappings();
         assertEquals(11, mappings3.size());
         assertEquals("Total Production", mappings3.get("yieldtotal"));

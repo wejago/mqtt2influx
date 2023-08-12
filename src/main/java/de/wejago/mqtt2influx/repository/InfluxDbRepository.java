@@ -3,13 +3,14 @@ package de.wejago.mqtt2influx.repository;
 import com.influxdb.client.WriteApi;
 import com.influxdb.client.write.Point;
 import de.wejago.mqtt2influx.config.InfluxDBConfig;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Repository;
+
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 @Repository
 @RequiredArgsConstructor
