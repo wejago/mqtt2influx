@@ -1,0 +1,320 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "target": {
+          "limit": 100,
+          "matchAny": false,
+          "tags": [],
+          "type": "dashboard"
+        },
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "P951FEA4DE68E13C5"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "kwatt"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "_day"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "0": {
+                        "index": 0,
+                        "text": "Sunday"
+                      },
+                      "1": {
+                        "index": 1,
+                        "text": "Monday"
+                      },
+                      "2": {
+                        "index": 2,
+                        "text": "Tuesday"
+                      },
+                      "3": {
+                        "index": 3,
+                        "text": "Wednesday"
+                      },
+                      "4": {
+                        "index": 4,
+                        "text": "Thursday"
+                      },
+                      "5": {
+                        "index": 5,
+                        "text": "Friday"
+                      },
+                      "6": {
+                        "index": 6,
+                        "text": "Saturday"
+                      }
+                    },
+                    "type": "value"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 15,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 12,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.97,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "auto",
+        "showValue": "always",
+        "stacking": "none",
+        "text": {
+          "valueSize": 10
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        },
+        "xField": "_day",
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
+      },
+      "pluginVersion": "9.4.3",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "P951FEA4DE68E13C5"
+          },
+          "query": "import \"date\"\r\nfrom(bucket:\"mqtt\")\r\n|> range(start: -1y)\r\n|> filter(fn: (r) =>\r\nr._measurement == \"sensor\" and\r\nr._field == \"Total Consumption\" and\r\nr.device_name == \"${device_name}\"\r\n)\r\n|> aggregateWindow(every: 1d, fn: spread, timeSrc:\"_start\")\r\n|> map(fn: (r) => ({r with _day: date.weekDay(t: r._time)}))\r\n|> group(columns:[\"_day\"], mode: \"by\")\r\n|> mean(column: \"_value\")\r\n|> group()",
+          "refId": "A"
+        }
+      ],
+      "title": "Weekday consumption - past 12 months",
+      "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "P951FEA4DE68E13C5"
+      },
+      "description": "consumption per week for the past 12 months",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "kwatt"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "_week"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "none"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 15,
+        "w": 24,
+        "x": 0,
+        "y": 15
+      },
+      "hidetimeoverride": true,
+      "id": 3,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.97,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "auto",
+        "showValue": "always",
+        "stacking": "none",
+        "text": {
+          "valueSize": 10
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        },
+        "xField": "_week",
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
+      },
+      "pluginVersion": "9.4.3",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "P951FEA4DE68E13C5"
+          },
+          "query": "import \"timezone\"\r\nimport \"date\"\r\noption location = timezone.location(name: \"Europe/Berlin\")\r\nfrom(bucket: \"mqtt\")\r\n  |> range(start: -12mo)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"sensor\" and r[\"_field\"] == \"Total Consumption\" and r[\"sensor_id\"] == \"090145425a01000c82dc\")\r\n  |> aggregateWindow(every: 1w, fn: spread, timeSrc:\"_start\", offset: -3d)\r\n  |> map(fn: (r) => ({r with _week: date.week(t: r._time)}))\r\n  |> group(columns:[\"_week\"], mode: \"by\")\r\n  |> group()",
+          "refId": "A"
+        }
+      ],
+      "timeTo": "now-1w/w",
+      "title": "Weekly consumption",
+      "type": "barchart"
+    }
+  ],
+  "refresh": "",
+  "revision": 1,
+  "schemaVersion": 38,
+  "style": "dark",
+  "tags": [],
+  "templating": {
+    "list": [
+      {
+        "current": {
+          "selected": true,
+          "text": "hichi",
+          "value": "hichi"
+        },
+        "hide": 0,
+        "includeAll": false,
+        "multi": false,
+        "name": "device_name",
+        "options": [
+          {
+            "selected": true,
+            "text": "hichi",
+            "value": "hichi"
+          },
+          {
+            "selected": false,
+            "text": "tele (Other consumption monitor)",
+            "value": "tele (Other consumption monitor)"
+          }
+        ],
+        "query": "hichi, tele (Other consumption monitor)",
+        "queryValue": "",
+        "skipUrlSync": false,
+        "type": "custom"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-24h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "Europe/Berlin",
+  "title": "03. power consumption - weekly and monthly",
+  "uid": "Md5SfoxVk",
+  "version": 1,
+  "weekStart": ""
+}

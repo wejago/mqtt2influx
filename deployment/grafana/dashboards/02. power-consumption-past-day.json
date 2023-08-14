@@ -1,0 +1,170 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "target": {
+          "limit": 100,
+          "matchAny": false,
+          "tags": [],
+          "type": "dashboard"
+        },
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "P951FEA4DE68E13C5"
+      },
+      "description": "consumption per hour for the past 24 hours",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "kwatt"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 30,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "hidetimeoverride": true,
+      "id": 8,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.97,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "auto",
+        "showValue": "always",
+        "stacking": "none",
+        "text": {
+          "valueSize": 10
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        },
+        "xField": "Time",
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "P951FEA4DE68E13C5"
+          },
+          "key": "Q-682c70ca-0bfa-4ddb-a838-e6349169f5bd-0",
+          "query": "import \"timezone\"\r\nimport \"date\"\r\n\r\noption location = timezone.location(name: \"Europe/Berlin\")\r\nts2 = date.sub(from: today(), d: 1d)\r\nte2 = date.sub(from: ts2, d: -24h)\r\n\r\nfrom(bucket: \"mqtt\")\r\n  |> range(start: ts2, stop: te2)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"sensor\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"Total Consumption\")\r\n  |> filter(fn: (r) => r[\"device_name\"] == \"${device_name}\")\r\n  |> aggregateWindow(every: 1h, fn: spread, timeSrc:\"_start\")",
+          "refId": "A"
+        }
+      ],
+      "timeTo": "now-1d/d",
+      "title": "Average consumption for the past day",
+      "type": "barchart"
+    }
+  ],
+  "refresh": "",
+  "revision": 1,
+  "schemaVersion": 38,
+  "style": "dark",
+  "tags": [],
+  "templating": {
+    "list": [
+      {
+        "current": {
+          "selected": true,
+          "text": "hichi",
+          "value": "hichi"
+        },
+        "hide": 0,
+        "includeAll": false,
+        "multi": false,
+        "name": "device_name",
+        "options": [
+          {
+            "selected": true,
+            "text": "hichi",
+            "value": "hichi"
+          },
+          {
+            "selected": false,
+            "text": "tele (Other consumption monitor)",
+            "value": "tele (Other consumption monitor)"
+          }
+        ],
+        "query": "hichi, tele (Other consumption monitor)",
+        "queryValue": "",
+        "skipUrlSync": false,
+        "type": "custom"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-24h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "Europe/Berlin",
+  "title": "02. power consumption past day (00:00-23:59)",
+  "uid": "53bfca9ba9d5",
+  "version": 2,
+  "weekStart": ""
+}
