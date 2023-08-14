@@ -1,6 +1,5 @@
 package de.wejago.mqtt2influx.factory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import de.wejago.mqtt2influx.config.Device;
 import de.wejago.mqtt2influx.repository.InfluxDbRepository;
 import de.wejago.mqtt2influx.service.JsonSubscriber;
@@ -13,7 +12,6 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class SubscriberFactory {
-    private final ObjectMapper objectMapper;
     private final InfluxDbRepository influxDbRepository;
     private final RawSubscriberService rawSubscriberService;
 
@@ -21,7 +19,7 @@ public class SubscriberFactory {
         if (device.getType().equals("raw")) {
             return new RawSubscriber(rawSubscriberService, device);
         } else {
-            return new JsonSubscriber(objectMapper, influxDbRepository, device);
+            return new JsonSubscriber(influxDbRepository, device);
         }
     }
 }

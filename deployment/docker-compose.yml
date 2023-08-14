@@ -24,7 +24,7 @@ services:
     depends_on:
       - influxdb
     environment:
-      - INFLUX_URL=http://influxdb:8086
+      - INFLUX_URL=http://influxdb:8086?readTimeout=90&writeTimeout=90&connectTimeout=30
       - INFLUX_TOKEN=${INFLUX_TOKEN}
       - MQTT_BROKER_IP=mosquitto
       - MQTT_BROKER_PORT=1883

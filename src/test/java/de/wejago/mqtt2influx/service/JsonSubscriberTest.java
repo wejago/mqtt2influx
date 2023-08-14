@@ -25,24 +25,27 @@ import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class JsonSubscriberTest {
-    private ObjectMapper objectMapper = new ObjectMapper();
     @Mock
     private InfluxDbRepository influxDbRepository;
 
     private Device device;
+    private Device device2;
     private JsonSubscriber jsonSubscriber;
+    private JsonSubscriber jsonSubscriber2;
 
     @BeforeEach
     public void setUp() {
-        buildTestDevice();
-        jsonSubscriber = new JsonSubscriber(objectMapper, influxDbRepository, device);
+        buildTestDevice1();
+        buildTestDevice2();
+        jsonSubscriber = new JsonSubscriber(influxDbRepository, device);
+        jsonSubscriber2 = new JsonSubscriber(influxDbRepository, device2);
     }
 
     @Test
-    void messageArrived_whenOnlyMatchFound() throws Exception {
+    void messageArrived_whenOnlyMatchFound() {
         // GIVEN
         String receivedMessage = "{\"Time\":\"2023-05-10T10:16:32\",\"\":{\"Total_in\":695.38,\"Total_out\":16.94,\"Power_curr\":1151," +
-                                 "\"device_id\":\"0a01454d480000b22b25\"}}";
+                                 "\"device_id\":\"012345affecaffee\"}}";
         MqttMessage mqttMessage = new MqttMessage(receivedMessage.getBytes());
         Point generatedTestPoint = buildTestPoint();
 
@@ -60,7 +63,27 @@ class JsonSubscriberTest {
     }
 
     @Test
-    void messageArrived_whenOnlyMatchNotFound() throws Exception {
+    void messageArrived_whenOnlyMatchFound2() {
+        // GIVEN
+        String receivedMessage = "{\"StatusSNS\":{\"Time\":\"2023-08-11T09:11:33\",\"SML\":{\"1_8_0\":25273.16,\"1_8_1\":25272.15,\"1_8_2\":1.02,\"2_8_0\":5.39,\"16_7_0\":-9.59,\"36_7_0\":81,\"56_7_0\":95,\"76_7_0\":-315,\"96_1_0\":\"012345affecaffee\"}}}";
+        MqttMessage mqttMessage = new MqttMessage(receivedMessage.getBytes());
+        Point generatedTestPoint = buildTestPoint2();
+
+        // WHEN
+        jsonSubscriber2.messageArrived("testTopic", mqttMessage);
+
+        // THEN
+        ArgumentCaptor<Point> captor = ArgumentCaptor.forClass(Point.class);
+        verify(influxDbRepository, times(1)).writePoint(captor.capture());
+        assertThat(captor.getValue())
+                .usingRecursiveComparison()
+                .ignoringFields("time")
+                .ignoringFields("precision")
+                .isEqualTo(generatedTestPoint);
+    }
+
+    @Test
+    void messageArrived_whenOnlyMatchNotFound() {
         // GIVEN
         MqttMessage mqttMessage = new MqttMessage("testPayload".getBytes());
 
@@ -72,7 +95,7 @@ class JsonSubscriberTest {
     }
 
     @Test
-    void messageArrived_whenJsonProcessingExceptionThrown() throws Exception {
+    void messageArrived_whenJsonProcessingExceptionThrown() {
         // GIVEN
         MqttMessage mqttMessage = new MqttMessage("device_id".getBytes());
 
@@ -83,7 +106,7 @@ class JsonSubscriberTest {
         verify(influxDbRepository, never()).writePoint(any());
     }
 
-    private void buildTestDevice() {
+    private void buildTestDevice1() {
         Map<String, String> deviceMappings = new HashMap<>();
         deviceMappings.put("Total_in", "Total Consumption");
         deviceMappings.put("Total_out", "Total Production");
@@ -96,13 +119,36 @@ class JsonSubscriberTest {
         device.setMappings(deviceMappings);
     }
 
+    private void buildTestDevice2() {
+        Map<String, String> deviceMappings = new HashMap<>();
+        deviceMappings.put("StatusSNS.SML.1_8_0", "Total Consumption");
+        deviceMappings.put("StatusSNS.SML.2_8_0", "Total Production");
+        deviceMappings.put("StatusSNS.SML.16_7_0", "Current Consumption");
+        deviceMappings.put("StatusSNS.SML.96_1_0", "Device ID");
+        device2 = new Device();
+        device2.setName("testName");
+        device2.setSensorId("StatusSNS.SML.96_1_0");
+        device2.setOnlyMatch("1_8_0");
+        device2.setMappings(deviceMappings);
+    }
+
     private Point buildTestPoint() {
         return Point.measurement("sensor")
                 .time(Instant.now(), WritePrecision.MS)
-                .addTag("sensor_id", "0a01454d480000b22b25")
+                .addTag("sensor_id", "012345affecaffee")
                 .addTag("device_name", "testName")
                 .addField("Total Consumption", 695.38)
                 .addField("Total Production", 16.94)
                 .addField("Current Consumption", 1151D);
+    }
+
+    private Point buildTestPoint2() {
+        return Point.measurement("sensor")
+                .time(Instant.now(), WritePrecision.MS)
+                .addTag("sensor_id", "012345affecaffee")
+                .addTag("device_name", "testName")
+                .addField("Total Consumption", 25273.16)
+                .addField("Total Production", 5.39)
+                .addField("Current Consumption", -9.59d);
     }
 }
