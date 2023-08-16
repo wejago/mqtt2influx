@@ -1,10 +1,10 @@
 package de.wejago.mqtt2influx.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.influxdb.client.domain.WritePrecision;
 import com.influxdb.client.write.Point;
 import de.wejago.mqtt2influx.config.Device;
 import de.wejago.mqtt2influx.repository.InfluxDbRepository;
+import de.wejago.mqtt2influx.utils.AbstractLoggingTest;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,7 +24,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-class JsonSubscriberTest {
+class JsonSubscriberTest extends AbstractLoggingTest<JsonSubscriber> {
     @Mock
     private InfluxDbRepository influxDbRepository;
 
@@ -35,6 +35,7 @@ class JsonSubscriberTest {
 
     @BeforeEach
     public void setUp() {
+        super.setUp();
         buildTestDevice1();
         buildTestDevice2();
         jsonSubscriber = new JsonSubscriber(influxDbRepository, device);
@@ -45,7 +46,7 @@ class JsonSubscriberTest {
     void messageArrived_whenOnlyMatchFound() {
         // GIVEN
         String receivedMessage = "{\"Time\":\"2023-05-10T10:16:32\",\"\":{\"Total_in\":695.38,\"Total_out\":16.94,\"Power_curr\":1151," +
-                                 "\"device_id\":\"012345affecaffee\"}}";
+                "\"device_id\":\"012345affecaffee\"}}";
         MqttMessage mqttMessage = new MqttMessage(receivedMessage.getBytes());
         Point generatedTestPoint = buildTestPoint();
 
@@ -65,7 +66,9 @@ class JsonSubscriberTest {
     @Test
     void messageArrived_whenOnlyMatchFound2() {
         // GIVEN
-        String receivedMessage = "{\"StatusSNS\":{\"Time\":\"2023-08-11T09:11:33\",\"SML\":{\"1_8_0\":25273.16,\"1_8_1\":25272.15,\"1_8_2\":1.02,\"2_8_0\":5.39,\"16_7_0\":-9.59,\"36_7_0\":81,\"56_7_0\":95,\"76_7_0\":-315,\"96_1_0\":\"012345affecaffee\"}}}";
+        String receivedMessage = "{\"StatusSNS\":{\"Time\":\"2023-08-11T09:11:33\",\"SML\":{\"1_8_0\":25273.16," +
+                "\"1_8_1\":25272.15,\"1_8_2\":1.02,\"2_8_0\":5.39,\"16_7_0\":-9.59,\"36_7_0\":81,\"56_7_0\":95," +
+                "\"76_7_0\":-315,\"96_1_0\":\"012345affecaffee\"}}}";
         MqttMessage mqttMessage = new MqttMessage(receivedMessage.getBytes());
         Point generatedTestPoint = buildTestPoint2();
 
@@ -80,6 +83,24 @@ class JsonSubscriberTest {
                 .ignoringFields("time")
                 .ignoringFields("precision")
                 .isEqualTo(generatedTestPoint);
+    }
+
+    @Test
+    void messageArrived_mappingNotFoundInMessage() {
+        // GIVEN
+        String receivedMessage = "{\"Time\":\"2023-08-14T07:31:14\",\"SML\":{\"1_8_0\":25310.10,\"1_8_1\":25309.08," +
+                "\"1_8_2\":1.02,\"2_8_0\":6.61,\"16_7_0\":-12.10,\"36_7_0\":30,\"56_7_0\":90,\"76_7_0\":-132," +
+                "\"96_1_0\":\"090145425a01000c82dc\"}}";
+        MqttMessage mqttMessage = new MqttMessage(receivedMessage.getBytes());
+
+        // WHEN
+        jsonSubscriber2.messageArrived("testTopic", mqttMessage);
+
+        // THEN
+        verify(influxDbRepository, times(0)).writePoint(any());
+        memoryAppender.assertContains("There is something wrong with the configuration");
+        memoryAppender.assertContains("Device ID not found");
+        memoryAppender.assertContains("There are no entries for your mappings");
     }
 
     @Test
