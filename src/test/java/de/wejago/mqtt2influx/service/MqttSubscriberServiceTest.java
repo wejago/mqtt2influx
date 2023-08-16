@@ -1,10 +1,9 @@
 package de.wejago.mqtt2influx.service;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
+import de.wejago.mqtt2influx.config.Device;
+import de.wejago.mqtt2influx.config.DevicesConfig;
+import de.wejago.mqtt2influx.factory.SubscriberFactory;
+import de.wejago.mqtt2influx.utils.AbstractLoggingTest;
 import org.eclipse.paho.client.mqttv3.IMqttClient;
 import org.eclipse.paho.client.mqttv3.IMqttMessageListener;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
@@ -15,14 +14,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import org.springframework.boot.test.system.CapturedOutput;
-import org.springframework.boot.test.system.OutputCaptureExtension;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
-import de.wejago.mqtt2influx.config.Device;
-import de.wejago.mqtt2influx.config.DevicesConfig;
-import de.wejago.mqtt2influx.factory.SubscriberFactory;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doThrow;
@@ -31,8 +27,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@ExtendWith({ OutputCaptureExtension.class, MockitoExtension.class })
-class MqttSubscriberServiceTest {
+@ExtendWith(MockitoExtension.class)
+class MqttSubscriberServiceTest extends AbstractLoggingTest<MqttSubscriberService> {
     @Mock
     private IMqttClient mqttClient;
     @Mock
@@ -70,7 +66,7 @@ class MqttSubscriberServiceTest {
     }
 
     @Test
-    void testConnectThrowsException(CapturedOutput output) throws MqttException {
+    void testConnectThrowsException() throws MqttException {
         // GIVEN
         doThrow(new MqttException(1)).when(mqttClient).connect(mqttConnectOptions);
 
@@ -79,9 +75,7 @@ class MqttSubscriberServiceTest {
 
         // THEN
         verify(mqttClient, times(1)).connect(mqttConnectOptions);
-        assertThatThrownBy(() -> {throw new MqttException(1);})
-            .isInstanceOf(MqttException.class);
-        assertThat(output.getOut()).contains("Error connecting to MQTT client!");
+        memoryAppender.assertContains("Error connecting to MQTT client!");
     }
 
     @Test

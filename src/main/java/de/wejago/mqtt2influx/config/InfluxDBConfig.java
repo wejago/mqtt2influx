@@ -5,12 +5,12 @@ import com.influxdb.client.InfluxDBClientFactory;
 import com.influxdb.client.WriteApi;
 import com.influxdb.exceptions.InfluxException;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @RequiredArgsConstructor
-@Slf4j
+@Log4j2
 public class InfluxDBConfig {
     private final InfluxDBProperties influxDBProperties;
     private InfluxDBClient influxDBClient;

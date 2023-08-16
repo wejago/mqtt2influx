@@ -1,23 +1,21 @@
 package de.wejago.mqtt2influx.service;
 
-import java.time.Instant;
-import java.util.HashMap;
-import java.util.Map;
-
+import com.github.wnameless.json.flattener.JsonFlattener;
+import com.influxdb.client.domain.WritePrecision;
+import com.influxdb.client.write.Point;
+import de.wejago.mqtt2influx.config.Device;
+import de.wejago.mqtt2influx.repository.InfluxDbRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.paho.client.mqttv3.IMqttMessageListener;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
-import com.github.wnameless.json.flattener.JsonFlattener;
-import com.influxdb.client.domain.WritePrecision;
-import com.influxdb.client.write.Point;
+import java.time.Instant;
+import java.util.HashMap;
+import java.util.Map;
 
-import de.wejago.mqtt2influx.config.Device;
-import de.wejago.mqtt2influx.repository.InfluxDbRepository;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-
-@Slf4j
+@Log4j2
 @RequiredArgsConstructor
 public class JsonSubscriber implements IMqttMessageListener {
     private final InfluxDbRepository influxDbRepository;
@@ -33,7 +31,7 @@ public class JsonSubscriber implements IMqttMessageListener {
                 Map<String, Object> deviceToPointProperties = matchValues(device.getMappings(), flatJson);
                 Point point = generateMeasurementPoint(deviceToPointProperties, device);
                 influxDbRepository.writePoint(point);
-            } catch(RuntimeException e) {
+            } catch (RuntimeException e) {
                 log.warn("Could not parse mqtt message: {} -> {}", e.getMessage(), receivedMessage);
             }
         }
@@ -43,8 +41,8 @@ public class JsonSubscriber implements IMqttMessageListener {
         Map<String, Object> result = new HashMap<>();
         mappings.forEach((source, dest) -> {
             Object value = flatJson.get(source);
-            if(value != null) {
-                if(value instanceof Integer integer) {
+            if (value != null) {
+                if (value instanceof Integer integer) {
                     result.put(dest, integer.doubleValue());
                 } else {
                     result.put(dest, value);
@@ -59,10 +57,10 @@ public class JsonSubscriber implements IMqttMessageListener {
         // remove the sensor_id because it is String and cannot be added to the point as a field
         deviceToPointProperties.remove(device.getMappings().get(device.getSensorId()));
         return Point
-            .measurement("sensor")
-            .addTag("device_name", device.getName())
-            .addTag("sensor_id", sensorId)
-            .addFields(deviceToPointProperties)
-            .time(Instant.now(), WritePrecision.MS);
+                .measurement("sensor")
+                .addTag("device_name", device.getName())
+                .addTag("sensor_id", sensorId)
+                .addFields(deviceToPointProperties)
+                .time(Instant.now(), WritePrecision.MS);
     }
 }

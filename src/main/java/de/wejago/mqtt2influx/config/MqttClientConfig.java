@@ -1,7 +1,7 @@
 package de.wejago.mqtt2influx.config;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 import org.eclipse.paho.client.mqttv3.IMqttClient;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
@@ -15,7 +15,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
-@Slf4j
+@Log4j2
 @Configuration
 @RequiredArgsConstructor
 public class MqttClientConfig {

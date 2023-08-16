@@ -1,18 +1,16 @@
 package de.wejago.mqtt2influx.factory;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.Objects;
-
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
+import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
 import org.springframework.core.env.PropertiesPropertySource;
 import org.springframework.core.env.PropertySource;
 import org.springframework.core.io.support.EncodedResource;
 import org.springframework.core.io.support.PropertySourceFactory;
 
-import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.Objects;
 
 public class YamlPropertySourceFactory implements PropertySourceFactory {
 
