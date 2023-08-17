@@ -5,7 +5,7 @@ import de.wejago.mqtt2influx.config.DevicesConfig;
 import de.wejago.mqtt2influx.factory.SubscriberFactory;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.paho.client.mqttv3.IMqttClient;
 import org.eclipse.paho.client.mqttv3.IMqttMessageListener;
@@ -13,7 +13,7 @@ import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.springframework.stereotype.Service;
 
-@Slf4j
+@Log4j2
 @Service
 @RequiredArgsConstructor
 public class MqttSubscriberService {

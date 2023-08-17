@@ -4,7 +4,7 @@ import com.influxdb.client.WriteApi;
 import com.influxdb.client.write.Point;
 import de.wejago.mqtt2influx.config.InfluxDBConfig;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Repository;
@@ -14,7 +14,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 @Repository
 @RequiredArgsConstructor
-@Slf4j
+@Log4j2
 @EnableScheduling
 public class InfluxDbRepository {
     private static final int SCHEDULE_INTERVAL_PERSIST_TO_DB = 30000;
