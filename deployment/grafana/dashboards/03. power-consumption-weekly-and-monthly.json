@@ -32,143 +32,6 @@
         "type": "influxdb",
         "uid": "P951FEA4DE68E13C5"
       },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "custom": {
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "fillOpacity": 80,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "lineWidth": 1,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
-          },
-          "unit": "kwatt"
-        },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "_day"
-            },
-            "properties": [
-              {
-                "id": "mappings",
-                "value": [
-                  {
-                    "options": {
-                      "0": {
-                        "index": 0,
-                        "text": "Sunday"
-                      },
-                      "1": {
-                        "index": 1,
-                        "text": "Monday"
-                      },
-                      "2": {
-                        "index": 2,
-                        "text": "Tuesday"
-                      },
-                      "3": {
-                        "index": 3,
-                        "text": "Wednesday"
-                      },
-                      "4": {
-                        "index": 4,
-                        "text": "Thursday"
-                      },
-                      "5": {
-                        "index": 5,
-                        "text": "Friday"
-                      },
-                      "6": {
-                        "index": 6,
-                        "text": "Saturday"
-                      }
-                    },
-                    "type": "value"
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      },
-      "gridPos": {
-        "h": 15,
-        "w": 24,
-        "x": 0,
-        "y": 0
-      },
-      "id": 12,
-      "options": {
-        "barRadius": 0,
-        "barWidth": 0.97,
-        "fullHighlight": false,
-        "groupWidth": 0.7,
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "orientation": "auto",
-        "showValue": "always",
-        "stacking": "none",
-        "text": {
-          "valueSize": 10
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        },
-        "xField": "_day",
-        "xTickLabelRotation": 0,
-        "xTickLabelSpacing": 0
-      },
-      "pluginVersion": "9.4.3",
-      "targets": [
-        {
-          "datasource": {
-            "type": "influxdb",
-            "uid": "P951FEA4DE68E13C5"
-          },
-          "query": "import \"date\"\r\nfrom(bucket:\"mqtt\")\r\n|> range(start: -1y)\r\n|> filter(fn: (r) =>\r\nr._measurement == \"sensor\" and\r\nr._field == \"Total Consumption\" and\r\nr.device_name == \"${device_name}\"\r\n)\r\n|> aggregateWindow(every: 1d, fn: spread, timeSrc:\"_start\")\r\n|> map(fn: (r) => ({r with _day: date.weekDay(t: r._time)}))\r\n|> group(columns:[\"_day\"], mode: \"by\")\r\n|> mean(column: \"_value\")\r\n|> group()",
-          "refId": "A"
-        }
-      ],
-      "title": "Weekday consumption - past 12 months",
-      "type": "barchart"
-    },
-    {
-      "datasource": {
-        "type": "influxdb",
-        "uid": "P951FEA4DE68E13C5"
-      },
       "description": "consumption per week for the past 12 months",
       "fieldConfig": {
         "defaults": {
@@ -226,7 +89,7 @@
         "h": 15,
         "w": 24,
         "x": 0,
-        "y": 15
+        "y": 0
       },
       "hidetimeoverride": true,
       "id": 3,
@@ -268,6 +131,151 @@
       ],
       "timeTo": "now-1w/w",
       "title": "Weekly consumption",
+      "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "P951FEA4DE68E13C5"
+      },
+      "description": "consumption per month for the past 12 months",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [
+            {
+              "options": {
+                "1": {
+                  "index": 0,
+                  "text": "January"
+                },
+                "2": {
+                  "index": 1,
+                  "text": "February"
+                },
+                "3": {
+                  "index": 2,
+                  "text": "March"
+                },
+                "4": {
+                  "index": 3,
+                  "text": "April"
+                },
+                "5": {
+                  "index": 4,
+                  "text": "May"
+                },
+                "6": {
+                  "index": 5,
+                  "text": "June"
+                },
+                "7": {
+                  "index": 6,
+                  "text": "July"
+                },
+                "8": {
+                  "index": 7,
+                  "text": "August"
+                },
+                "9": {
+                  "index": 8,
+                  "text": "September"
+                },
+                "10": {
+                  "index": 9,
+                  "text": "October"
+                },
+                "11": {
+                  "index": 10,
+                  "text": "November"
+                },
+                "12": {
+                  "index": 11,
+                  "text": "December"
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "kwatt"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 15,
+        "w": 24,
+        "x": 0,
+        "y": 15
+      },
+      "hideTimeOverride": false,
+      "id": 7,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.97,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "auto",
+        "showValue": "always",
+        "stacking": "none",
+        "text": {
+          "valueSize": 10
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        },
+        "xField": "Time",
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "P951FEA4DE68E13C5"
+          },
+          "query": "import \"timezone\"\r\nimport \"date\"\r\noption location = timezone.location(name: \"Europe/Berlin\")\r\nfrom(bucket: \"mqtt\")\r\n  |> range(start: - 12mo)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"sensor\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"Total Consumption\")\r\n  |> filter(fn: (r) => r[\"device_name\"] == \"${device_name}\")\r\n  |> aggregateWindow(every: 1mo, fn: spread, timeSrc:\"_start\")",
+          "refId": "A"
+        }
+      ],
+      "title": "Monthly consumption",
       "type": "barchart"
     }
   ],
