@@ -14,6 +14,7 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BiConsumer;
 
 @Log4j2
 @RequiredArgsConstructor
@@ -29,8 +30,14 @@ public class JsonSubscriber implements IMqttMessageListener {
             try {
                 Map<String, Object> flatJson = JsonFlattener.flattenAsMap(receivedMessage);
                 Map<String, Object> deviceToPointProperties = matchValues(device.getMappings(), flatJson);
-                Point point = generateMeasurementPoint(deviceToPointProperties, device);
-                influxDbRepository.writePoint(point);
+                String deviceKeyValue = device.getMappings().get(device.getSensorId());
+                if(deviceKeyValue == null || !deviceToPointProperties.containsKey(deviceKeyValue) ||
+                        deviceToPointProperties.size() < 2) {
+                    logConfigurationProblems(deviceKeyValue, deviceToPointProperties, flatJson);
+                } else {
+                    Point point = generateMeasurementPoint(deviceToPointProperties, device, deviceKeyValue);
+                    influxDbRepository.writePoint(point);
+                }
             } catch (RuntimeException e) {
                 log.warn("Could not parse mqtt message: {} -> {}", e.getMessage(), receivedMessage);
             }
@@ -52,15 +59,33 @@ public class JsonSubscriber implements IMqttMessageListener {
         return result;
     }
 
-    private Point generateMeasurementPoint(Map<String, Object> deviceToPointProperties, Device device) {
-        String sensorId = deviceToPointProperties.get(device.getMappings().get(device.getSensorId())).toString();
+    private Point generateMeasurementPoint(Map<String, Object> deviceToPointProperties,
+                                           Device device, String deviceKeyValue) {
+
+        String sensorId = deviceToPointProperties.get(deviceKeyValue).toString();
         // remove the sensor_id because it is String and cannot be added to the point as a field
-        deviceToPointProperties.remove(device.getMappings().get(device.getSensorId()));
+        deviceToPointProperties.remove(deviceKeyValue);
         return Point
                 .measurement("sensor")
                 .addTag("device_name", device.getName())
                 .addTag("sensor_id", sensorId)
                 .addFields(deviceToPointProperties)
                 .time(Instant.now(), WritePrecision.MS);
+    }
+
+    private void logConfigurationProblems(String deviceKeyValue, Map<String, Object> deviceToPointProperties,
+                                          Map<String, Object> flatJson) {
+        log.warn("There is something wrong with the configuration for device {}!", device.getName());
+        if(deviceKeyValue == null || !deviceToPointProperties.containsKey(deviceKeyValue)) {
+            log.warn("Device ID not found! Specified: '{}' In Mesage: {}", deviceKeyValue,
+                    deviceToPointProperties.containsKey(deviceKeyValue));
+        }
+        if(deviceToPointProperties.size() < 2) {
+            log.warn("There are no entries for your mappings!");
+            log.info("Mappings:");
+            device.getMappings().forEach((source, dest) -> log.info(" - {}", source));
+            log.info("JsonPaths in message:");
+            flatJson.forEach((key, value) -> log.info(" - {}", key));
+        }
     }
 }
