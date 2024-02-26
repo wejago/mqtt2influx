@@ -465,7 +465,7 @@
             "type": "influxdb",
             "uid": "P951FEA4DE68E13C5"
           },
-          "query": "import \"date\"\r\nimport \"timezone\"\r\noption location = timezone.location(name: \"Europe/Berlin\")\r\nts = date.sub(from: today(), d: 1w)\r\nte = today()\r\nfrom(bucket: \"mqtt\")\r\n  |> range(start: ts, stop: te)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"sensor\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"Current power\")\r\n  |> aggregateWindow(every: 1h, fn: mean)\r\n  |> aggregateWindow(every: 1d, fn: sum, timeSrc:\"_start\")",
+          "query": "import \"date\"\r\nimport \"timezone\"\r\noption location = timezone.location(name: \"Europe/Berlin\")\r\nts = date.sub(from: today(), d: 6d)\r\nte = now()\r\nfrom(bucket: \"mqtt\")\r\n  |> range(start: ts, stop: te)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"sensor\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"Current power\")\r\n  |> aggregateWindow(every: 1h, fn: mean)\r\n  |> aggregateWindow(every: 1d, fn: sum, timeSrc:\"_start\")",
           "refId": "A"
         }
       ],
