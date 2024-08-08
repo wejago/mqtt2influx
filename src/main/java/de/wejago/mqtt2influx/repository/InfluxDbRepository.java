@@ -28,10 +28,10 @@ public class InfluxDbRepository {
     @Scheduled(fixedRate = SCHEDULE_INTERVAL_PERSIST_TO_DB)
     public void persistPointsToInflux() {
         if (!measurementPoints.isEmpty()) {
-            WriteApi writeApi = influxDBConfig.getWriteApi();
+            final WriteApi writeApi = influxDBConfig.getWriteApi();
             if (writeApi != null) {
                 while (!measurementPoints.isEmpty()) {
-                    Point point = measurementPoints.poll();
+                    final Point point = measurementPoints.poll();
                     writeApi.writePoint(point);
                 }
             }

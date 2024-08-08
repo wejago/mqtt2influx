@@ -43,11 +43,11 @@ class MqttClientConfigTest {
     @Test
     void testSetMqttConnectOptionsReturnsNonNull() {
         // GIVEN
-        MqttClientConfig mqttClientConfig = new MqttClientConfig(mqttProperties);
+        MqttClientConfig anotherClientconfig = new MqttClientConfig(mqttProperties);
         when(mqttProperties.getPassword()).thenReturn(TEST_PASSWORD);
 
         // WHEN
-        MqttConnectOptions connectOptions = mqttClientConfig.getMqttConnectOptions();
+        MqttConnectOptions connectOptions = anotherClientconfig.getMqttConnectOptions();
 
         // THEN
         assertThat(connectOptions).isNotNull();

@@ -12,11 +12,12 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class SubscriberFactory {
+    public static final String TYPE_RAW = "raw";
     private final InfluxDbRepository influxDbRepository;
     private final RawSubscriberService rawSubscriberService;
 
     public IMqttMessageListener create(Device device) {
-        if (device.getType().equals("raw")) {
+        if (TYPE_RAW.equals(device.getType())) {
             return new RawSubscriber(rawSubscriberService, device);
         } else {
             return new JsonSubscriber(influxDbRepository, device);

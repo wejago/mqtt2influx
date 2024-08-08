@@ -33,7 +33,7 @@ class RawSubscriberTest {
     }
 
     @Test
-    void messageArrived_WithValidMapping() throws Exception {
+    void messageArrived_WithValidMapping() {
         // GIVEN
         String receivedMessage = "208.20";
         String topic = "test/topic/yieldtotal";
@@ -47,7 +47,7 @@ class RawSubscriberTest {
     }
 
     @Test
-    void messageArrived_WithInvalidMapping() throws Exception {
+    void messageArrived_WithInvalidMapping() {
         // GIVEN
         String receivedMessage = "208.20";
         String topic = "test/topic/invalid_mapping";

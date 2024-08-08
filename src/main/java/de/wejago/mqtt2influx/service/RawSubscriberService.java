@@ -20,16 +20,17 @@ import java.util.concurrent.ConcurrentHashMap;
 @EnableScheduling
 @Getter
 public class RawSubscriberService {
+    private static final int SCHEDULE_INTERVAL_PERSIST_TO_QUEUE = 60000;
+
     private final InfluxDbRepository influxDbRepository;
 
     // This map stores the points for each device to be written to the database
     // Key: Sensor ID of the device
     private final Map<String, Point> points = new ConcurrentHashMap<>();
-    private static final int SCHEDULE_INTERVAL_PERSIST_TO_QUEUE = 60000;
 
     public void updatePoint(Device device, String key, Double measurement) {
         if (!points.containsKey(device.getSensorId())) {
-            Point point = createPoint(device);
+            final Point point = createPoint(device);
             points.put(device.getSensorId(), point);
         }
 
@@ -38,11 +39,11 @@ public class RawSubscriberService {
 
     @Scheduled(fixedRate = SCHEDULE_INTERVAL_PERSIST_TO_QUEUE)
     public void scheduleAddPointToQueue() {
-        Iterator<Map.Entry<String, Point>> iterator = points.entrySet().iterator();
+        final Iterator<Map.Entry<String, Point>> iterator = points.entrySet().iterator();
 
         while (iterator.hasNext()) {
-            Map.Entry<String, Point> entry = iterator.next();
-            Point point = entry.getValue();
+            final Map.Entry<String, Point> entry = iterator.next();
+            final Point point = entry.getValue();
 
             if (point.hasFields()) {
                 point.time(Instant.now(), WritePrecision.MS);
@@ -52,7 +53,7 @@ public class RawSubscriberService {
         }
     }
 
-    private Point createPoint(Device device) {
+    private static Point createPoint(Device device) {
         return Point.measurement("sensor")
                     .addTag("device_name", device.getName())
                     .addTag("sensor_id", device.getSensorId());

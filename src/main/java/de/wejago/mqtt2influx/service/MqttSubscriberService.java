@@ -26,15 +26,15 @@ public class MqttSubscriberService {
     public void postConstruct() {
         try {
             mqttClient.connect(mqttConnectOptions);
-            if(devicesConfig.getDevices() == null) {
+            if (devicesConfig.getDevices() == null) {
                 log.error("No devices in mqtt2influx-configuration.yaml");
                 return;
             }
-            for (Device device : devicesConfig.getDevices()) {
+            for (final Device device : devicesConfig.getDevices()) {
                 if (isDeviceValid(device)) {
-                    IMqttMessageListener subscriber = subscriberFactory.create(device);
+                    final IMqttMessageListener subscriber = subscriberFactory.create(device);
                     mqttClient.subscribe(device.getTopic(), subscriber);
-                    log.info("subscribed to topic: " + device.getTopic());
+                    log.info("subscribed to topic: {}", device.getTopic());
                 }
             }
         } catch (MqttException e) {
@@ -43,24 +43,27 @@ public class MqttSubscriberService {
     }
 
     private static boolean isDeviceValid(Device device) {
-        if(device == null) {
+        boolean isValid = true;
+        if (device == null) {
             log.warn("Could NOT subscribe to device! The device is null.");
-            return false;
-        } else if(StringUtils.isBlank(device.getTopic())) {
-            log.warn("Could NOT subscribe to device! The device topic is blank for device: " + device + " Topic: " + device.getTopic());
-            return false;
-        } else if(device.getMappings().isEmpty()) {
-            log.warn("Could NOT subscribe to device! The deviceMapping is empty for device: "+ device);
-            return false;
-        } else if(StringUtils.isBlank(device.getSensorId())) {
-            log.warn("Could NOT subscribe to device! The sensorId is blank for device: " + device + " SensorId: " + device.getSensorId());
-            return false;
+            isValid = false;
+        } else if (StringUtils.isBlank(device.getTopic())) {
+            log.warn("Could NOT subscribe to device! The device topic is blank for device: {}} Topic: {}", device,
+                    device.getTopic());
+            isValid = false;
+        } else if (device.getMappings().isEmpty()) {
+            log.warn("Could NOT subscribe to device! The deviceMapping is empty for device: {}", device);
+            isValid = false;
+        } else if (StringUtils.isBlank(device.getSensorId())) {
+            log.warn("Could NOT subscribe to device! The sensorId is blank for device: {} SensorId: {}", device,
+                    device.getSensorId());
+            isValid = false;
+        } else {
+            if (device.getTopic().contains("ThisShouldBeChanged")) {
+                log.warn("Service is currently using the packaged default configuration, " +
+                                "you should adapt it to your needs!");
+            }
         }
-
-        if(device.getTopic().contains("ThisShouldBeChanged")) {
-            log.warn("Service is currently using the packaged default configuration, you should adapt it to your needs!");
-        }
-
-        return true;
+        return isValid;
     }
 }

@@ -29,7 +29,7 @@ class YamlPropertySourceFactoryTest {
     private final YamlPropertySourceFactory classToTest = new YamlPropertySourceFactory();
 
     @Test
-    void createPropertySource_noResource() throws IOException {
+    void createPropertySource_noResource() {
         when(encodedResource.getResource()).thenReturn(resource);
         when(resource.exists()).thenReturn(false);
         

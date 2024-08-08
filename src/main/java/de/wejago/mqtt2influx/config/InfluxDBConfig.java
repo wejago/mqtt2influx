@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.context.annotation.Configuration;
 
+import static org.apache.commons.lang3.StringUtils.isBlank;
+
 @Configuration
 @RequiredArgsConstructor
 @Log4j2
@@ -32,14 +34,19 @@ public class InfluxDBConfig {
                 influxDBClient = getInfluxDbClient();
             }
             writeApi = influxDBClient.makeWriteApi();
-        } catch (Exception e) {
+        } catch (InfluxException e) {
             log.warn("Failed to create writeApi: {}", e.getMessage(), e);
         }
     }
 
     InfluxDBClient getInfluxDbClient() throws InfluxException {
+        String tokenString = influxDBProperties.getToken();
+        if (isBlank(tokenString) || isBlank(influxDBProperties.getUrl()) || isBlank(influxDBProperties.getOrg())
+                || isBlank(influxDBProperties.getBucket())) {
+            throw new InfluxException("InfluxDB configuration is missing or empty");
+        }
         return InfluxDBClientFactory.create(influxDBProperties.getUrl(),
-                influxDBProperties.getToken().toCharArray(), influxDBProperties.getOrg(),
+                tokenString.toCharArray(), influxDBProperties.getOrg(),
                 influxDBProperties.getBucket());
     }
 }
