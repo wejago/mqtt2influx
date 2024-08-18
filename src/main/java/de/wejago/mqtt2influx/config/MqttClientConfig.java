@@ -25,21 +25,22 @@ public class MqttClientConfig {
     @Bean
     public IMqttClient getMqttClient() {
         try (MemoryPersistence persistence = new MemoryPersistence()) {
-            String clientId = "mqtt-2-influx-db-application-" + InetAddress.getLocalHost().getHostName();
-            log.info("mqtt IP: " + mqttProperties.getBrokerIp() + " user: " + mqttProperties.getUsername() + " client ID: " + clientId);
+            final String clientId = "mqtt-2-influx-db-application-" + InetAddress.getLocalHost().getHostName();
+            log.info("mqtt IP: {} user: {} client ID: {}", mqttProperties.getBrokerIp(),
+                    mqttProperties.getUsername(), clientId);
             return new MqttClient(buildBrokerUrl(), clientId, persistence);
         } catch (MqttException e) {
             log.error("Error connecting to MQTT client!", e);
             return null;
         } catch (UnknownHostException e) {
             log.error("Error UnknownHostException!", e);
-            throw new RuntimeException(e);
+            return null;
         }
     }
 
     @Bean
     public MqttConnectOptions getMqttConnectOptions() {
-        MqttConnectOptions connectOptions = new MqttConnectOptions();
+        final MqttConnectOptions connectOptions = new MqttConnectOptions();
         connectOptions.setUserName(mqttProperties.getUsername());
         connectOptions.setPassword(mqttProperties.getPassword().toCharArray());
         connectOptions.setCleanSession(true);
@@ -47,7 +48,7 @@ public class MqttClientConfig {
     }
 
     private String buildBrokerUrl() {
-        UriComponents uriComponents = UriComponentsBuilder
+        final UriComponents uriComponents = UriComponentsBuilder
             .newInstance()
             .scheme(PROTOCOL_TCP)
             .host(mqttProperties.getBrokerIp())

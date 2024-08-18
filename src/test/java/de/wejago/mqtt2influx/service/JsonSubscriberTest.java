@@ -1,6 +1,5 @@
 package de.wejago.mqtt2influx.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.influxdb.client.domain.WritePrecision;
 import com.influxdb.client.write.Point;
 import de.wejago.mqtt2influx.config.Device;

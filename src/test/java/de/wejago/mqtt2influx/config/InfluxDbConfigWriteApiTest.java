@@ -2,7 +2,6 @@ package de.wejago.mqtt2influx.config;
 
 import com.influxdb.client.WriteApi;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -12,8 +11,7 @@ class InfluxDbConfigWriteApiTest {
     private final String INFLUX_ORG = "test-organization";
     private final String INFLUX_BUCKET = "test-bucket1";
 
-    @InjectMocks
-    InfluxDBConfig influxDBConfig;
+    private InfluxDBConfig influxDBConfig;
 
     @Test
     void getWriteApi_returnsNull_whenInfluxDBClientIsNull() {

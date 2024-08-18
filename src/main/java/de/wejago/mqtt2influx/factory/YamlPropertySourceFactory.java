@@ -16,8 +16,9 @@ public class YamlPropertySourceFactory implements PropertySourceFactory {
 
     @NotNull
     @Override
-    public PropertySource<?> createPropertySource(@Nullable String name, EncodedResource encodedResource) throws IOException {
-        YamlPropertiesFactoryBean factory = new YamlPropertiesFactoryBean();
+    public PropertySource<?> createPropertySource(@Nullable String name, EncodedResource encodedResource)
+            throws IOException {
+        final YamlPropertiesFactoryBean factory = new YamlPropertiesFactoryBean();
         if(encodedResource.getResource().exists()) {
             factory.setResources(encodedResource.getResource());
             return new PropertiesPropertySource(Objects.requireNonNull(encodedResource.getResource().getFilename()),

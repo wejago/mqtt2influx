@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.eclipse.paho.client.mqttv3.IMqttMessageListener;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 @RequiredArgsConstructor
@@ -14,13 +15,13 @@ public class RawSubscriber implements IMqttMessageListener {
 
     @Override
     public void messageArrived(String topic, MqttMessage mqttMessage) {
-        String receivedMessage = new String(mqttMessage.getPayload());
+        final String receivedMessage = new String(mqttMessage.getPayload(), StandardCharsets.UTF_8);
 
-        Map<String, String> deviceMappings = device.getMappings();
-        String measurementKey = topic.substring(topic.lastIndexOf("/") + 1);
+        final Map<String, String> deviceMappings = device.getMappings();
+        final String measurementKey = topic.substring(topic.lastIndexOf('/') + 1);
 
         if (deviceMappings.containsKey(measurementKey)) {
-            Double measurementValue = Double.valueOf(receivedMessage);
+            final Double measurementValue = Double.valueOf(receivedMessage);
             rawSubscriberService.updatePoint(device, measurementKey, measurementValue);
         }
     }

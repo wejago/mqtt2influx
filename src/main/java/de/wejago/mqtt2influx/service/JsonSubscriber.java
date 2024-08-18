@@ -11,6 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.paho.client.mqttv3.IMqttMessageListener;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
@@ -23,13 +24,13 @@ public class JsonSubscriber implements IMqttMessageListener {
 
     @Override
     public void messageArrived(String topic, MqttMessage mqttMessage) {
-        String receivedMessage = new String(mqttMessage.getPayload());
+        final String receivedMessage = new String(mqttMessage.getPayload(), StandardCharsets.UTF_8);
 
         if (StringUtils.isNotBlank(device.getOnlyMatch()) && receivedMessage.contains(device.getOnlyMatch())) {
             try {
-                Map<String, Object> flatJson = JsonFlattener.flattenAsMap(receivedMessage);
-                Map<String, Object> deviceToPointProperties = matchValues(device.getMappings(), flatJson);
-                Point point = generateMeasurementPoint(deviceToPointProperties, device);
+                final Map<String, Object> flatJson = JsonFlattener.flattenAsMap(receivedMessage);
+                final Map<String, Object> deviceToPointProperties = matchValues(device.getMappings(), flatJson);
+                final Point point = generateMeasurementPoint(deviceToPointProperties, device);
                 influxDbRepository.writePoint(point);
             } catch (RuntimeException e) {
                 log.warn("Could not parse mqtt message: {} -> {}", e.getMessage(), receivedMessage);
@@ -37,10 +38,10 @@ public class JsonSubscriber implements IMqttMessageListener {
         }
     }
 
-    private Map<String, Object> matchValues(Map<String, String> mappings, Map<String, Object> flatJson) {
-        Map<String, Object> result = new HashMap<>();
+    private static Map<String, Object> matchValues(Map<String, String> mappings, Map<String, Object> flatJson) {
+        final Map<String, Object> result = new HashMap<>();
         mappings.forEach((source, dest) -> {
-            Object value = flatJson.get(source);
+            final Object value = flatJson.get(source);
             if (value != null) {
                 if (value instanceof Integer integer) {
                     result.put(dest, integer.doubleValue());
@@ -52,8 +53,8 @@ public class JsonSubscriber implements IMqttMessageListener {
         return result;
     }
 
-    private Point generateMeasurementPoint(Map<String, Object> deviceToPointProperties, Device device) {
-        String sensorId = deviceToPointProperties.get(device.getMappings().get(device.getSensorId())).toString();
+    private static Point generateMeasurementPoint(Map<String, Object> deviceToPointProperties, Device device) {
+        final String sensorId = deviceToPointProperties.get(device.getMappings().get(device.getSensorId())).toString();
         // remove the sensor_id because it is String and cannot be added to the point as a field
         deviceToPointProperties.remove(device.getMappings().get(device.getSensorId()));
         return Point
