@@ -58,6 +58,10 @@ public class MqttSubscriberService {
             log.warn("Could NOT subscribe to device! The sensorId is blank for device: {} SensorId: {}", device,
                     device.getSensorId());
             isValid = false;
+        } else if ("json".equals(device.getType()) && !device.getMappings().containsKey(device.getSensorId())) {
+            log.warn("Could NOT subscribe to device! The sensorId is not in the mappings: {} SensorId: {}",
+                    device, device.getSensorId());
+            isValid = false;
         } else {
             if (device.getTopic().contains("ThisShouldBeChanged")) {
                 log.warn("Service is currently using the packaged default configuration, " +

@@ -133,6 +133,22 @@ class MqttSubscriberServiceTest extends AbstractLoggingTest<MqttSubscriberServic
         verify(mqttClient, never()).subscribe(anyString(), any());
     }
 
+    @Test
+    void postConstruct_sensorIdNotInMapping() throws MqttException {
+        //GIVEN
+        Device device = initializeTestDevice(1);
+        device.setSensorId("abc");
+        device.setMappings(Map.of("Key", "Value"));
+        device.setType("json");
+        when(devicesConfig.getDevices()).thenReturn(Collections.singletonList(device));
+
+        //WHEN
+        mqttSubscriberService.postConstruct();
+
+        //THEN
+        verify(mqttClient, never()).subscribe(anyString(), any());
+    }
+
     private Device initializeTestDevice(int deviceNum) {
         Map<String, String> deviceMapping = new HashMap<>();
         deviceMapping.put("key" + deviceNum, "value" + deviceNum);

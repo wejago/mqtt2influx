@@ -12,7 +12,7 @@
             <AppenderRef ref="Console" />
         </Root>
 
-        <Logger name="de.wejago" level="debug"/>
+        <Logger name="de.wejago" level="info"/>
     </Loggers>
 
 </Configuration>
