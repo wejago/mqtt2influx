@@ -105,6 +105,26 @@ class JsonSubscriberTest {
         verify(influxDbRepository, never()).writePoint(any());
     }
 
+    @Test
+    void messageArrived_noOnlyMatch() {
+
+    }
+
+    @Test
+    void messageArrived_checkString() {
+        // GIVEN
+        Device deviceNext = buildTestDeviceNext();
+        JsonSubscriber subscriber = new JsonSubscriber(influxDbRepository, deviceNext);
+        String msg = "{\"device\": 121578518586686, \"queries\": 106900, \"blocked\": 36012, \"percent\": 33.7, \"safesearch\": 720, \"proctime\": 10.924999999999999}";
+        MqttMessage mqttMessage = new MqttMessage(msg.getBytes());
+
+        // WHEN
+        subscriber.messageArrived("testTopic", mqttMessage);
+
+        // THEN
+        verify(influxDbRepository).writePoint(any());
+    }
+
     private void buildTestDevice1() {
         Map<String, String> deviceMappings = new HashMap<>();
         deviceMappings.put("Total_in", "Total Consumption");
@@ -129,6 +149,22 @@ class JsonSubscriberTest {
         device2.setSensorId("StatusSNS.SML.96_1_0");
         device2.setOnlyMatch("1_8_0");
         device2.setMappings(deviceMappings);
+    }
+
+    private Device buildTestDeviceNext() {
+        Map<String, String> deviceMappings = new HashMap<>();
+        deviceMappings.put("queries", "Queries");
+        deviceMappings.put("blocked", "Blocked");
+        deviceMappings.put("percent", "Percent");
+        deviceMappings.put("safesearch", "Safesearch");
+        deviceMappings.put("device", "Device");
+        deviceMappings.put("proctime", "Average processing time");
+        Device device = new Device();
+        device.setName("testName");
+        device.setSensorId("device");
+        device.setOnlyMatch("");
+        device.setMappings(deviceMappings);
+        return device;
     }
 
     private Point buildTestPoint() {
