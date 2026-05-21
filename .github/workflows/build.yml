@@ -1,4 +1,6 @@
 name: build
+name: build
+name: build
 on: [push]
 jobs:
   build:
@@ -35,7 +37,7 @@ jobs:
         env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
             SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=wejago_hichi2influx -Dsonar.scanner.skipJreProvisioning=true
+        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.scanner.skipJreProvisioning=true
 
   docker:
     runs-on: ubuntu-latest
