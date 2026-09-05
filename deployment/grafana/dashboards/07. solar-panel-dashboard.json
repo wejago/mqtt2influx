@@ -307,7 +307,7 @@
               }
             ]
           },
-          "unit": "watt"
+          "unit": "kwatt"
         },
         "overrides": [
           {
@@ -362,7 +362,7 @@
             "type": "influxdb",
             "uid": "P951FEA4DE68E13C5"
           },
-          "query": "import \"timezone\"\r\noption location = timezone.location(name: \"Europe/Berlin\")\r\n\r\nfrom(bucket: \"mqtt\")\r\n  |> range(start: - 12mo)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"sensor\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"Current power\")\r\n  |> aggregateWindow(every: 1h, fn: mean)\r\n  |> aggregateWindow(every: 1w, offset: -3d, fn: sum, timeSrc:\"_start\")",
+          "query": "import \"timezone\"\r\noption location = timezone.location(name: \"Europe/Berlin\")\r\n\r\nfrom(bucket: \"mqtt\")\r\n  |> range(start: -13mo)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"sensor\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"Total Production\")\r\n  |> filter(fn: (r) => r[\"sensor_id\"] == \"id\")\r\n  |> aggregateWindow(every: 1w, offset: -3d, fn: last, createEmpty: false, timeSrc: \"_start\")\r\n  |> difference(nonNegative: true)",
           "refId": "A"
         }
       ],
@@ -413,7 +413,7 @@
               }
             ]
           },
-          "unit": "watt"
+          "unit": "kwatt"
         },
         "overrides": [
           {
@@ -465,7 +465,7 @@
             "type": "influxdb",
             "uid": "P951FEA4DE68E13C5"
           },
-          "query": "import \"date\"\r\nimport \"timezone\"\r\noption location = timezone.location(name: \"Europe/Berlin\")\r\nts = date.sub(from: today(), d: 6d)\r\nte = now()\r\nfrom(bucket: \"mqtt\")\r\n  |> range(start: ts, stop: te)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"sensor\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"Current power\")\r\n  |> aggregateWindow(every: 1h, fn: mean)\r\n  |> aggregateWindow(every: 1d, fn: sum, timeSrc:\"_start\")",
+          "query": "import \"date\"\r\nimport \"timezone\"\r\noption location = timezone.location(name: \"Europe/Berlin\")\r\nts = date.sub(from: today(), d: 7d)\r\nte = now()\r\nfrom(bucket: \"mqtt\")\r\n  |> range(start: ts, stop: te)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"sensor\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"Total Production\")\r\n  |> filter(fn: (r) => r[\"sensor_id\"] == \"id\")\r\n  |> aggregateWindow(every: 1d, fn: last, createEmpty: false, timeSrc: \"_start\")\r\n  |> difference(nonNegative: true)",
           "refId": "A"
         }
       ],
@@ -516,7 +516,7 @@
               }
             ]
           },
-          "unit": "watt"
+          "unit": "kwatt"
         },
         "overrides": [
           {
@@ -568,7 +568,7 @@
             "type": "influxdb",
             "uid": "P951FEA4DE68E13C5"
           },
-          "query": "import \"timezone\"\r\noption location = timezone.location(name: \"Europe/Berlin\")\r\n\r\nfrom(bucket: \"mqtt\")\r\n  |> range(start: -12mo)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"sensor\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"Current power\")\r\n  |> aggregateWindow(every: 1h, fn: mean)\r\n  |> aggregateWindow(every: 1mo, fn: sum, timeSrc:\"_start\")",
+          "query": "import \"timezone\"\r\noption location = timezone.location(name: \"Europe/Berlin\")\r\n\r\nfrom(bucket: \"mqtt\")\r\n  |> range(start: -13mo)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"sensor\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"Total Production\")\r\n  |> filter(fn: (r) => r[\"sensor_id\"] == \"id\")\r\n  |> aggregateWindow(every: 1mo, fn: last, createEmpty: false, timeSrc: \"_start\")\r\n  |> difference(nonNegative: true)",
           "refId": "A"
         }
       ],
