@@ -2,12 +2,14 @@ package de.wejago.mqtt2influx.service;
 
 import de.wejago.mqtt2influx.config.Device;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.eclipse.paho.client.mqttv3.IMqttMessageListener;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
+@Log4j2
 @RequiredArgsConstructor
 public class RawSubscriber implements IMqttMessageListener {
     private final RawSubscriberService rawSubscriberService;
@@ -22,7 +24,12 @@ public class RawSubscriber implements IMqttMessageListener {
 
         if (deviceMappings.containsKey(measurementKey)) {
             final Double measurementValue = Double.valueOf(receivedMessage);
-            rawSubscriberService.updatePoint(device, measurementKey, measurementValue);
+            final String field = deviceMappings.get(measurementKey);
+            if (device.isPlausible(field, measurementValue)) {
+                rawSubscriberService.updatePoint(device, measurementKey, measurementValue);
+            } else {
+                log.warn("Dropped implausible value {} for {} of device {}", measurementValue, field, device.getName());
+            }
         }
     }
 }

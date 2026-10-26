@@ -1,6 +1,7 @@
 package de.wejago.mqtt2influx.service;
 
 import de.wejago.mqtt2influx.config.Device;
+import de.wejago.mqtt2influx.config.ValueLimit;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -9,6 +10,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -55,6 +57,22 @@ class RawSubscriberTest {
 
         // WHEN
         rawSubscriber.messageArrived(topic, mqttMessage);
+
+        // THEN
+        verify(rawSubscriberService, never()).updatePoint(any(Device.class), anyString(), anyDouble());
+    }
+
+    @Test
+    void messageArrived_dropsImplausibleValue() {
+        // GIVEN
+        final ValueLimit limit = new ValueLimit();
+        limit.setField("Total Production");
+        limit.setMin(1D);
+        device.setLimits(List.of(limit));
+        MqttMessage mqttMessage = new MqttMessage("0".getBytes());
+
+        // WHEN
+        rawSubscriber.messageArrived("test/topic/yieldtotal", mqttMessage);
 
         // THEN
         verify(rawSubscriberService, never()).updatePoint(any(Device.class), anyString(), anyDouble());
