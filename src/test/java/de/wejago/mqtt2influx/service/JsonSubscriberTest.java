@@ -3,6 +3,7 @@ package de.wejago.mqtt2influx.service;
 import com.influxdb.client.domain.WritePrecision;
 import com.influxdb.client.write.Point;
 import de.wejago.mqtt2influx.config.Device;
+import de.wejago.mqtt2influx.config.ValueLimit;
 import de.wejago.mqtt2influx.repository.InfluxDbRepository;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,6 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Instant;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -106,6 +108,50 @@ class JsonSubscriberTest {
     }
 
     @Test
+    void messageArrived_dropsOnlyImplausibleFields() {
+        // GIVEN
+        device.setLimits(List.of(limit("Total Consumption", 1D, 10000000D),
+                limit("Current Consumption", -25000D, 25000D)));
+        String receivedMessage = "{\"Time\":\"2023-05-10T10:16:32\",\"\":{\"Total_in\":0,\"Total_out\":16.94,\"Power_curr\":999999," +
+                                 "\"device_id\":\"012345affecaffee\"}}";
+        MqttMessage mqttMessage = new MqttMessage(receivedMessage.getBytes());
+        Point expectedPoint = Point.measurement("sensor")
+                .time(Instant.now(), WritePrecision.MS)
+                .addTag("sensor_id", "012345affecaffee")
+                .addTag("device_name", "testName")
+                .addField("Total Production", 16.94);
+
+        // WHEN
+        jsonSubscriber.messageArrived("testTopic", mqttMessage);
+
+        // THEN
+        ArgumentCaptor<Point> captor = ArgumentCaptor.forClass(Point.class);
+        verify(influxDbRepository, times(1)).writePoint(captor.capture());
+        assertThat(captor.getValue())
+                .usingRecursiveComparison()
+                .ignoringFields("time")
+                .ignoringFields("precision")
+                .isEqualTo(expectedPoint);
+    }
+
+    @Test
+    void messageArrived_writesNothingWhenAllFieldsImplausible() {
+        // GIVEN
+        device.setLimits(List.of(limit("Total Consumption", 1D, 10000000D),
+                limit("Total Production", 1D, 10000000D),
+                limit("Current Consumption", -25000D, 25000D)));
+        String receivedMessage = "{\"Time\":\"2023-05-10T10:16:32\",\"\":{\"Total_in\":0,\"Total_out\":0,\"Power_curr\":999999," +
+                                 "\"device_id\":\"012345affecaffee\"}}";
+        MqttMessage mqttMessage = new MqttMessage(receivedMessage.getBytes());
+
+        // WHEN
+        jsonSubscriber.messageArrived("testTopic", mqttMessage);
+
+        // THEN
+        verify(influxDbRepository, never()).writePoint(any());
+    }
+
+    @Test
     void messageArrived_noOnlyMatch() {
 
     }
@@ -123,6 +169,14 @@ class JsonSubscriberTest {
 
         // THEN
         verify(influxDbRepository).writePoint(any());
+    }
+
+    private static ValueLimit limit(String field, Double min, Double max) {
+        final ValueLimit limit = new ValueLimit();
+        limit.setField(field);
+        limit.setMin(min);
+        limit.setMax(max);
+        return limit;
     }
 
     private void buildTestDevice1() {

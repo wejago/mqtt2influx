@@ -14,6 +14,26 @@ devices:
       '56_7_0': Current Consumption Phase 2
       '76_7_0': Current Consumption Phase 3
       '96_1_0': Device ID
+    # values outside of [min, max] are dropped, the reader sometimes reports 0, 999999 or garbage
+    limits:
+      - field: Total Consumption
+        min: 1
+        max: 10000000
+      - field: Total Production
+        min: 1
+        max: 10000000
+      - field: Current Consumption
+        min: -25000
+        max: 25000
+      - field: Current Consumption Phase 1
+        min: -25000
+        max: 25000
+      - field: Current Consumption Phase 2
+        min: -25000
+        max: 25000
+      - field: Current Consumption Phase 3
+        min: -25000
+        max: 25000
   - name: tele (Other consumption monitor)
     type: json
     topic: tele/power/SENSOR

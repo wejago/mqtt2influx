@@ -29,9 +29,11 @@ public class JsonSubscriber implements IMqttMessageListener {
         if (StringUtils.isBlank(device.getOnlyMatch()) || onlyMatches(receivedMessage)) {
             try {
                 final Map<String, Object> flatJson = JsonFlattener.flattenAsMap(receivedMessage);
-                final Map<String, Object> deviceToPointProperties = matchValues(device.getMappings(), flatJson);
+                final Map<String, Object> deviceToPointProperties = matchValues(device, flatJson);
                 final Point point = generateMeasurementPoint(deviceToPointProperties, device);
-                influxDbRepository.writePoint(point);
+                if (point.hasFields()) {
+                    influxDbRepository.writePoint(point);
+                }
             } catch (RuntimeException e) {
                 log.warn("Could not parse mqtt message: {} -> {}", e.getMessage(), receivedMessage, e);
             }
@@ -44,16 +46,19 @@ public class JsonSubscriber implements IMqttMessageListener {
         return StringUtils.isNotBlank(device.getOnlyMatch()) && receivedMessage.contains(device.getOnlyMatch());
     }
 
-    private static Map<String, Object> matchValues(Map<String, String> mappings, Map<String, Object> flatJson) {
+    private static Map<String, Object> matchValues(Device device, Map<String, Object> flatJson) {
         final Map<String, Object> result = new HashMap<>();
-        mappings.forEach((source, dest) -> {
+        device.getMappings().forEach((source, dest) -> {
             final Object value = flatJson.get(source);
-            if (value != null) {
-                if (value instanceof Integer integer) {
-                    result.put(dest, integer.doubleValue());
-                } else {
-                    result.put(dest, value);
-                }
+            if (value == null) {
+                return;
+            }
+            if (!device.isPlausible(dest, value)) {
+                log.warn("Dropped implausible value {} for {} of device {}", value, dest, device.getName());
+            } else if (value instanceof Integer integer) {
+                result.put(dest, integer.doubleValue());
+            } else {
+                result.put(dest, value);
             }
         });
         return result;
